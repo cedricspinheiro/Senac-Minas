@@ -1,0 +1,2 @@
+https://lucid.app/lucidchart/12865286-d9ca-42ee-98bd-d2ad15bee1b1/edit?beaconFlowId=0C03ADD466162C11&invitationId=inv_59d765d9-b2c5-445d-b5e6-ccca7ef6e539&page=.Q4MUjXso07N#
+https://mg.senac.br/Paginas/default.aspx
