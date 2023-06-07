@@ -1,10 +1,15 @@
 from tkinter import *
+<<<<<<< Updated upstream
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 
 wb = load_workbook('Dados Cadastrais.xlsx')
+=======
+from openpyxl import load_workbook
+>>>>>>> Stashed changes
 
+wb = load_workbook('Dados Cadastrais.xlsx')
 ws = wb.active
 ws.title = 'Dados Cadastrais'
 
@@ -20,6 +25,7 @@ def exit():
 
 
 def search():
+<<<<<<< Updated upstream
     resultado_window = Toplevel(janela)
     resultado_window.title('Resultado da Pesquisa')
 
@@ -50,6 +56,12 @@ def search():
     # Impedir que o usuário edite a tabela
     resultado_text.configure(state='disabled')
 
+=======
+    data = []
+    for row in ws.iter_rows(values_only=True):
+        data.append(row)
+    pesqdados.config(text='\n'.join(str(row) for row in data))
+>>>>>>> Stashed changes
 
 
 janela = Tk()
@@ -115,5 +127,13 @@ sair = Button(botoes, text='Sair', command=exit)
 sair.grid(row=2, column=1)
 pesq = Button(botoes, text='Pesquisar', command=search)
 pesq.grid(row=2, column=2)
+<<<<<<< Updated upstream
+=======
+
+pesquisa = LabelFrame(janela)
+pesquisa.grid(row=3, column=0)
+pesqdados = Label(pesquisa, text='')
+pesqdados.grid(row=0, column=0)
+>>>>>>> Stashed changes
 
 janela.mainloop()
