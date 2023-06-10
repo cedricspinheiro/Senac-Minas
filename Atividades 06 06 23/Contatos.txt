@@ -1,0 +1,10 @@
+Nome: Cedric, Celular: 35991059115
+Email: cedric.dev.assist@outlook.pt, Observações: Informações de Contato, Telefone = Recado!
+
+Nome: Teste, Celular: (35)99999-9999
+Email: qualquer@coisa.facil, Observações: Somente um teste
+
+Nome: , Celular: 
+Email: , Observações: 
+Telefone
+

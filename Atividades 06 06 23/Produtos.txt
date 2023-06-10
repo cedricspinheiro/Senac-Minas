@@ -1,0 +1,5 @@
+Nome do Produto: Coca-cola, Preço: 3.39, Quantidade: 12, Descrição do produto: A lata
+Nome do Produto: , Preço: , Quantidade: , Descrição do produto: 
+Nome do Produto: , Preço: , Quantidade: , Descrição do produto: 
+Nome do Produto: , Preço: , Quantidade: , Descrição do produto: 
+Nome do Produto: , Preço: , Quantidade: , Descrição do produto: 

@@ -1,0 +1,2 @@
+Categoria: Educação, Valor: 500.0, Data: 10/06/2023, Descrição: Senac Minas
+Categoria: Transporte, Valor: 50.0, Data: 10/06/2023, Descrição: Passe Senac
