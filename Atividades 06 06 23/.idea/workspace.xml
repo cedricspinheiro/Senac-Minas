@@ -5,13 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bc7d16b0-cfd7-42e9-8e40-a5afbaffc649" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Contatos.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Despesas.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Gerenciador de despesas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Produtos.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Agenda de Contatos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Agenda de Contatos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Banco de Dados/Dados Cadastrais.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Banco de Dados/Dados Cadastrais.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Projeto Integrador/Projeto Integrador Cedric.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,14 +26,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/nkkara/Documentos/Repertorios/Senac Minas"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Python.Gerenciador de despesas">
     <configuration name="Agenda de Contatos" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Atividades 06 06 23" />

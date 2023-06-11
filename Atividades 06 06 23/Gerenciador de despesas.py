@@ -14,7 +14,7 @@ def salvar():
     valor = float(entrada_valor.get())
     soma_gastos += valor
     total_soma_gastos.config(text=str(soma_gastos))
-    with open('Despesas.txt', 'a') as arquivo:
+    with open('/home/nkkara/Documentos/Repertorios/Senac Minas/Atividades 06 06 23/Despesas.txt', 'a') as arquivo:
         arquivo.write(
             f'Categoria: {opcao_selecionada.get()}, Valor: {valor}, Data: {entrada_data.get()}, Descrição: {entrada_descricao.get()}\n')
     exibir_gastos()
@@ -26,7 +26,7 @@ def salvar():
 
 def exibir_gastos():
     gastos_text.delete('1.0', END)
-    with open('Despesas.txt', 'r') as arquivo:
+    with open('/home/nkkara/Documentos/Repertorios/Senac Minas/Atividades 06 06 23/Despesas.txt', 'r') as arquivo:
         for linha in arquivo:
             gastos_text.insert(END, linha)
 
@@ -38,7 +38,7 @@ def calcular():
 
 
 def limpar_arquivo():
-    with open('Despesas.txt', 'w') as arquivo:
+    with open('/home/nkkara/Documentos/Repertorios/Senac Minas/Atividades 06 06 23/Despesas.txt', 'w') as arquivo:
         arquivo.truncate(0)
     exibir_gastos()
 

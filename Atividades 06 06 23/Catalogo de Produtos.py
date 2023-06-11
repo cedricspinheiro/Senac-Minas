@@ -1,7 +1,7 @@
 from tkinter import *
 
 def salvar():
-    with open('Produtos.txt', 'a') as arquivo:
+    with open('/home/nkkara/Documentos/Repertorios/Senac Minas/Atividades 06 06 23/Produtos.txt', 'a') as arquivo:
         arquivo.write(
             f'Nome do Produto: {nome_produto.get()}, Preço: {preco_produto.get()}, Quantidade: {quantidade_produto.get()}, Descrição do produto: {descricao_produto.get()}')
         arquivo.write('\n')
@@ -17,7 +17,7 @@ def salvar():
 
 def exibir_produtos():
     produtos_text.delete('1.0', END)
-    with open('Produtos.txt', 'r') as arquivo:
+    with open('/home/nkkara/Documentos/Repertorios/Senac Minas/Atividades 06 06 23/Produtos.txt', 'r') as arquivo:
         for linha in arquivo:
             partes = linha.strip().split(',')
             linha_formatada = '{:<20}{:<15}{:<15}{:<20}'.format(*partes)
