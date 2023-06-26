@@ -34,4 +34,7 @@ lb_pontos.place(relx=0.6, rely=0.5, anchor=CENTER)
 pontuação = Label(end_game, text=str(pontos), font=("Arial", 18, "bold"))
 pontuação.place(relx=0.8, rely=0.5, anchor=CENTER)
 
+restart_game = Button(end_game, text='Restart', anchor=CENTER, command=restart)
+restart_game.place(relx=0.5, rely=0.7)
+
 janela.mainloop()
