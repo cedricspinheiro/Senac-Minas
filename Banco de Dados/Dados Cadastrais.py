@@ -10,46 +10,35 @@ wb = load_workbook('Dados Cadastrais.xlsx')
 ws = wb.active
 ws.title = 'Dados Cadastrais'
 
-
 def save():
     to_append = [enome.get(), ecpf.get(), etelefone.get(), edata.get(), ebairro.get(), ecidade.get(), euf.get()]
     ws.append(to_append)
-
 
 def exit():
     wb.save('Dados Cadastrais.xlsx')
     janela.destroy()
 
-
 def search():
     resultado_window = Toplevel(janela)
     resultado_window.title('Resultado da Pesquisa')
 
-    # Ler o arquivo Excel usando pandas
     df = pd.read_excel('Dados Cadastrais.xlsx')
-
-    # Criar uma tabela usando uma caixa de texto
     resultado_text = Text(resultado_window, width=100, height=20)
     resultado_text.pack()
 
-    # Adicionar uma barra de rolagem à caixa de texto
     scrollbar = Scrollbar(resultado_window)
     scrollbar.pack(side=RIGHT, fill=Y)
     resultado_text.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=resultado_text.yview)
 
-    # Formatar os dados para exibição
     colunas = df.columns.tolist()
     linhas = df.values.tolist()
 
-    # Inserir os cabeçalhos das colunas na tabela
     resultado_text.insert(END, "\t".join(colunas) + "\n")
 
-    # Inserir os dados das linhas na tabela
     for linha in linhas:
         resultado_text.insert(END, "\t".join(str(valor) for valor in linha) + "\n")
 
-    # Impedir que o usuário edite a tabela
     resultado_text.configure(state='disabled')
 
     data = []

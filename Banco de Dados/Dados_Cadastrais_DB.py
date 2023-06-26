@@ -1,3 +1,4 @@
+
 import sqlite3
 from tkinter import *
 
@@ -17,7 +18,7 @@ def criar_banco():
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS dados_enderecos (
-            cpf TEXT PRIMARY KEY,
+            cpf_dados_pessoais TEXT PRIMARY KEY,
             rua TEXT,
             numero TEXT,
             bairro TEXT,
@@ -29,7 +30,6 @@ def criar_banco():
     conexao.commit()
     conexao.close()
 
-
 def save():
     conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
     cursor = conexao.cursor()
@@ -39,7 +39,7 @@ def save():
     ''', (enome.get(), ecpf.get(), etelefone.get(), edata.get()))
 
     cursor.execute('''
-        INSERT INTO dados_enderecos (cpf, rua, numero, bairro, cidade, uf)
+        INSERT INTO dados_enderecos (cpf_dados_pessoais,rua, numero, bairro, cidade, uf)
         VALUES (?, ?, ?, ?, ?, ?);
     ''', (ecpf.get(), erua.get(), enumero.get(), ebairro.get(), ecidade.get(), euf.get()))
 
@@ -55,80 +55,113 @@ def save():
     ecidade.delete(0, 'end')
     euf.delete(0, 'end')
 
+def lista_cadastros():
+    def deletar_cpf():
+        global lb_pessoas
+        global lb_enderecos
 
-def lista():
-    def search():
         conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
         cursor = conexao.cursor()
-        cursor.execute(f"SELECT * FROM dados_pessoais where cpf = '{in_buscar.get()}'")
-        dados_pessoais = cursor.fetchall()
-        saida_pessoa = Label(lf_resultado, text='Dados Pessoais')
-        saida_pessoa.grid(row=0, column=0)
-        for dados_pessoal in dados_pessoais:
-            saida_pessoa['text'] += '\n' + str(dados_pessoal).replace("'", "")
-        cursor1 = conexao.cursor()
-        cursor1.execute(f"select * from dados_enderecos where cpf = '{in_buscar.get()}'")
-        dados_enderecos = cursor1.fetchall()
-        saida_endereco = Label(lf_resultado, text='Dados do Endereço')
-        saida_endereco.grid(row=0, column=1)
-        for dados_endereco in dados_enderecos:
-            saida_endereco['text'] += '\n' + str(dados_endereco).replace("'", "")
+        cursor.execute(f'DELETE FROM dados_pessoais WHERE cpf = "{et_cpf.get()}"')
+        cursor2 = conexao.cursor()
+        cursor2.execute(f'DELETE FROM dados_enderecos WHERE cpf_dados_pessoais = "{et_cpf.get()}"')
+        conexao.commit()
         conexao.close()
 
-    def pessoal():
+        lb_deletado = Label(lf_resultado, text='Dados Deletados', anchor='center')
+        lb_deletado.grid(row=0, column=0, columnspan=2, sticky='we')
+        lb_pessoas.config(text='(' + str(et_cpf.get()) + ') - Dados DELETATOS', anchor='center')
+        lb_enderecos.config(text='(' + str(et_cpf.get()) + ') - Dados DELETATOS', justify='center')
+
+        et_cpf.delete(0, 'end')
+
+    def search():
+        global lb_deletado
+        global lb_pessoas
+        global lb_enderecos
+
+        conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
+        cursor1 = conexao.cursor()
+        cursor1.execute(f'select * from dados_pessoais WHERE cpf = "{et_cpf.get()}"')
+        dados_pessoas = cursor1.fetchall()
+        lb_pessoas = Label(lf_resultado, text='Leitura de Dados', justify='center')
+        lb_pessoas.grid(row=1, column=0)
+        for dados_pessoa in dados_pessoas:
+            lb_pessoas['text'] += '\n' + str(dados_pessoa)
+
+        cursor2 = conexao.cursor()
+        cursor2.execute(f'select * from dados_enderecos WHERE cpf_dados_pessoais = "{et_cpf.get()}"')
+        dados_enderecos = cursor2.fetchall()
+        lb_enderecos = Label(lf_resultado, text='Leitura de Endereços', justify='center')
+        lb_enderecos.grid(row=1, column=1)
+        for dados_endereco in dados_enderecos:
+            lb_enderecos['text'] += '\n' + str(dados_endereco)
+        conexao.close()
+        lb_deletado.config(text=(''))
+
+    def bc_pessoas():
         conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
         cursor = conexao.cursor()
         cursor.execute('select * from dados_pessoais')
-        dados_pessoais = cursor.fetchall()
-        lb_saida_pes = Label(lf_pessoal, text='Leitura de Dados:', justify='left')
-        lb_saida_pes.grid(row=0, column=0, sticky='we')
-        for dados_pessoa in dados_pessoais:
-            lb_saida_pes['text'] += '\n' + str(dados_pessoa).replace("'", "")
+        dados_pessoas = cursor.fetchall()
+
+        lb_pessoas = Label(lf_pessoas, text='Leitura de Dados', justify='center')
+        lb_pessoas.grid(row=1, column=0)
+
+        for dados_pessoa in dados_pessoas:
+            lb_pessoas['text'] += '\n' + str(dados_pessoa)
+
         conexao.close()
 
-    def enderecos():
+    def bc_endereco():
         conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
         cursor = conexao.cursor()
         cursor.execute('select * from dados_enderecos')
         dados_enderecos = cursor.fetchall()
-        lb_saida_end = Label(lf_endereco, text='Leitura de Dados:', justify='left')
-        lb_saida_end.grid(row=0, column=0, sticky='we')
+
+        lb_endereco = Label(lf_enderecos, text='Leitura de Endereços', justify='center')
+        lb_endereco.grid(row=1, column=0)
+
         for dados_endereco in dados_enderecos:
-            lb_saida_end['text'] += '\n' + str(dados_endereco).replace("'", "")
-        conexao.close()
+            lb_endereco['text'] += '\n' + str(dados_endereco)
+
 
     janela_lista = Tk()
     janela_lista.title('Lista de Cadastros')
-    janela_lista.config(pady=10, padx=10)
+    janela_lista.configure(padx=10, pady=10)
 
-    lf_buscar = LabelFrame(janela_lista, text='Buscar Cadastro', labelanchor='n')
-    lf_buscar.grid(row=0, column=0, columnspan=2)
-    lf_buscar.config(padx=10, pady=10)
+    lf_busca = LabelFrame(janela_lista, text='Buscar CPF')
+    lf_busca.grid(row=0, column=0, columnspan=2)
+
+    lb_cpf = Label(lf_busca, text='CPF:', anchor='e')
+    lb_cpf.grid(row=0, column=0, sticky='we', padx=10, pady=10, rowspan=2)
+    et_cpf = Entry(lf_busca)
+    et_cpf.grid(row=0, column=1, columnspan=2, sticky='we', rowspan=2)
+    bt_buscar = Button(lf_busca, text='Buscar', anchor='w', command=search)
+    bt_buscar.grid(row=0, column=3, padx=10, pady=10)
+    bt_deletar = Button(lf_busca, text='Deletar', anchor='w', command=deletar_cpf)
+    bt_deletar.grid(row=1, column=3, padx=10, pady=10)
+
+    lf_lista = LabelFrame(janela_lista, text='Lista de Cadastros')
+    lf_lista.grid(row=0, column=0, columnspan=2)
+
     lf_resultado = LabelFrame(janela_lista, text='Resultado', labelanchor='n')
     lf_resultado.grid(row=1, column=0, columnspan=2, sticky='we')
-    lf_resultado.config(padx=10, pady=10)
-    lf_pessoal = LabelFrame(janela_lista, text='Dados Pessoais', labelanchor='n')
-    lf_pessoal.grid(row=2, column=0)
-    lf_pessoal.config(padx=10, pady=10)
-    pessoal()
-    lf_endereco = LabelFrame(janela_lista, text='Dados de Endereços', labelanchor='n')
-    lf_endereco.grid(row=2, column=1)
-    lf_endereco.config(padx=10, pady=10)
-    enderecos()
-    lb_buscar = Label(lf_buscar, text='CPF:', anchor='e')
-    lb_buscar.grid(row=0, column=0, sticky='we')
 
-    in_buscar = Entry(lf_buscar)
-    in_buscar.grid(row=0, column=1, sticky='we')
+    lf_pessoas = LabelFrame(janela_lista, text='Cadastros de Pessoas', labelanchor='n')
+    lf_pessoas.grid(row=2, column=0)
+    bc_pessoas()
 
-    bt_buscar = Button(lf_buscar, text='Buscar', command=search)
-    bt_buscar.grid(row=0, column=2, sticky='we')
+    lf_enderecos = LabelFrame(janela_lista, text='Cadastros de Endereços', labelanchor='n')
+    lf_enderecos.grid(row=2, column=1)
+    bc_endereco()
 
+    janela_lista.mainloop()
 
 janela = Tk()
 janela.title('Cadastro')
 janela.config(borderwidth=10)
-janela.option_add('*Font', 'Arial 8 bold')
+#janela.option_add('*Font', 'Arial 8 bold')
 
 dados = LabelFrame(janela, text='Dados Pessoais', font='Arial 14 italic')
 dados.grid(row=0, column=0, sticky='we', columnspan=5)
@@ -185,8 +218,8 @@ botoes.config(borderwidth=0)
 gravar = Button(botoes, text='Gravar Dados', command=save)
 gravar.grid(row=3, column=0)
 
-lista = Button(botoes, text='Lista', command=lista)
-lista.grid(row=3, column=1)
+cadastros = Button(botoes, text='Cadastros', command=lista_cadastros)
+cadastros.grid(row=3, column=1)
 
 sair = Button(botoes, text='Sair', command=janela.quit)
 sair.grid(row=3, column=2)

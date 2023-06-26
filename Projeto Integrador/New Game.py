@@ -1,60 +1,76 @@
+from tkinter.ttk import *
 from tkinter import *
 from PIL import Image, ImageTk
-import os
+import sqlite3
 
 contador_erradas = 0
+pontuacao = 0
+
+def BANCO():
+    conexao = sqlite3.connect('Banco_pontuacao.db')
+    cursor1 = conexao.cursor()
+    cursor1.execute("""
+            create table if not exists Pontuação (
+                id integer primary key autoincrement,
+                nome text,
+                pontos integer
+            )
+            """)
+    conexao.close()
 
 
 def zerar_rank():
-    # arquivo_rank = '/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/Rank.txt'
-    arquivo_rank = 'Rank.txt'
-    with open(arquivo_rank, "w") as file:
-        file.write('')
-    print('O Rank foi Zerado!')
+    conexao = sqlite3.connect('Banco_pontuacao.db')
+    cursor = conexao.cursor()
+    cursor.execute("DELETE FROM Pontuação")
+    conexao.commit()
+    conexao.close()
+    print('Rank Zerado!')
 
-
-def adicionar_letra_errada(letra):
+def adicionar_letra_errada():
     global contador_erradas
     contador_erradas += 1
-    letras_erradas_var.set(f"{letras_erradas_var.get()} {letra}")
-    if contador_erradas >= 7:
-        pass
+    def adicionar_letra_certa():
+        global contador_certas
+        contador_certas += 1
+        return adicionar_letra_certa
+    return adicionar_letra_certa
+
+def adicionar_letra_certa():
+    global contador_certas
+    contador_certas += 1
+    return adicionar_letra_certa
+
+    pass
 
 
 def verificar_letra():
-    if letra.get() == "a":
-        letra.set("b")
-        letra.update()
-        return
-
+    pass
 
 def mostrar_tela_nick():
     tela_new_game.destroy()
     tela_nick_name.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-
 def mostrar_tela_forca():
+    et_nick = nick_entry.get()  # Definir et_nick antes de utilizá-lo
     tela_nick_name.destroy()
     tela_forca.place(relx=0.5, rely=0.5, anchor=CENTER)
-
-
-def salvar_nick():
-    nick_digitado = nick_entry.get()
-    # arquivo_nick = "/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/Nick_Name.txt"
-    arquivo_nick = "Nick_Name.txt"
-    with open(arquivo_nick, "w") as file:
-        file.write(nick_digitado)
-    print("Nick salvo com sucesso!")
-    nick_entry.delete(0, END)
-    mostrar_tela_forca()
-
-
+    lb_nick = Label(janela, text='Nick:', anchor=CENTER)
+    lb_nick.place(relx=0.20, rely=0.05)
+    nick = Label(janela, text=et_nick, anchor=CENTER)
+    nick.place(relx=0.40, rely=0.05)
+    pontos = Label(janela, text='Pontuação', anchor=CENTER)
+    pontos.place(relx=0.60, rely=0.05)
+    lb_pontos = Label(janela, text=pontuacao, anchor=CENTER)
+    lb_pontos.place(relx=0.80, rely=0.05)
 def abrir_rank():
-    # arquivo_rank = "/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/Rank.txt"
-    arquivo_rank = "Rank.txt"
-    with open(arquivo_rank, "r") as file:
-        conteudo_rank = file.read()
-    return conteudo_rank
+    conexao = sqlite3.connect('Banco_pontuacao.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT * FROM Pontuação")
+    dados = cursor.fetchall()
+    conexao.close()
+    return dados
+
 
 
 janela = Tk()
@@ -65,8 +81,8 @@ janela.resizable(False, False)
 tela_new_game = LabelFrame(janela)
 tela_new_game.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-# imagem_new_game = Image.open("/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/New_Game.jpg")
-imagem_new_game = Image.open("New_Game.jpg")
+imagem_new_game = Image.open("/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/New_Game.jpg")
+#imagem_new_game = Image.open("New_Game.jpg")
 imagem_new_game = imagem_new_game.resize((200, 200))
 foto_new_game = ImageTk.PhotoImage(imagem_new_game)
 label_new_game = Label(tela_new_game, image=foto_new_game)
@@ -91,7 +107,7 @@ nick_entry = Entry(tela_nick_name)
 nick_entry.grid(row=1, column=1, padx=10, pady=10)
 nick_entry.focus()
 
-salvar_nick = Button(tela_nick_name, text="AVANÇAR", anchor="center", command=salvar_nick)
+salvar_nick = Button(tela_nick_name, text="AVANÇAR", anchor="center", command=mostrar_tela_forca)
 salvar_nick.grid(row=2, columnspan=2)
 salvar_nick.configure(background="black", foreground="white", activebackground="white", activeforeground="black")
 
@@ -100,8 +116,8 @@ tela_forca = LabelFrame(janela)
 quadro_imagem_forca = LabelFrame(tela_forca)
 quadro_imagem_forca.grid(row=0, column=0, sticky='nswe')
 
-# imagem_forca = Image.open("/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/Tela_Game.png")
-imagem_forca = Image.open("Tela_Game.png")
+imagem_forca = Image.open("/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/Tela_Game.png")
+#imagem_forca = Image.open("Tela_Game.png")
 imagem_forca = imagem_forca.resize((200, 200))
 foto_forca = ImageTk.PhotoImage(imagem_forca)
 label_forca = Label(quadro_imagem_forca, image=foto_forca)
@@ -116,9 +132,7 @@ quadro_letras_erradas.grid(row=0, column=1, sticky='nswe')
 letras_erradas = Label(quadro_letras_erradas, text='Letras Erradas:')
 letras_erradas.grid(row=0, padx=10, pady=10, sticky='w')
 
-letras_erradas_var = StringVar()
-letras_erradas_label = Label(quadro_letras_erradas, textvariable=letras_erradas_var, font=("Arial", 18, "bold"),
-                             fg="red")
+letras_erradas_label = Label(quadro_letras_erradas, text=letras_erradas_var, font=("Arial", 18, "bold"), fg="red")
 letras_erradas_label.grid(row=1, padx=10, pady=10, sticky='w')
 
 quadro_palavra_secreta = LabelFrame(tela_forca)
@@ -126,6 +140,9 @@ quadro_palavra_secreta.grid(row=1, column=0, columnspan=2, sticky='nswe')
 
 palavra_secreta = Label(quadro_palavra_secreta, text='Palavra Secreta')
 palavra_secreta.grid(padx=10, pady=10)
+
+segredo = Label(quadro_palavra_secreta, text= 'PARALELEPÍPEDO', anchor=CENTER)
+segredo.place(relx=0.3, rely=0.5)
 
 quadro_entrada_letra = LabelFrame(tela_forca)
 quadro_entrada_letra.grid(row=2, column=0, columnspan=2, sticky='nswe')
@@ -148,6 +165,8 @@ quadro_rank.grid(row=0, column=2, rowspan=3, sticky='nswe', padx=10, pady=10)
 
 rank = Label(quadro_rank, text='Rank')
 rank.grid(padx=10, pady=10)
+BANCO()
+dados = abrir_rank()
 
 ranked_labels = []
 for i in range(1, 21):
@@ -155,13 +174,20 @@ for i in range(1, 21):
     ranked_label.grid(padx=1, pady=1, sticky='e')
     ranked_labels.append(ranked_label)
 
-conteudo_rank = abrir_rank()
+
+abrir_rank()
+
 ranked_entries = []
 for i in range(1, 21):
-    ranked_entry = Entry(quadro_rank)
-    ranked_entry.insert(END, conteudo_rank)
+    if i <= len(dados):
+        ranked_entry = Entry(quadro_rank)
+        ranked_entry.insert(END, dados[i-1])
+    else:
+        ranked_entry = Entry(quadro_rank, state='readonly')
     ranked_entry.config(state='readonly')
     ranked_entry.grid(row=i, column=1, padx=5, pady=2.5)
     ranked_entries.append(ranked_entry)
+
+
 
 janela.mainloop()
