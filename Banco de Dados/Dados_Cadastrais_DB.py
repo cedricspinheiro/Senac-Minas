@@ -90,7 +90,7 @@ def lista_cadastros():
             lb_pessoas['text'] += '\n' + str(dados_pessoa)
 
         cursor2 = conexao.cursor()
-        cursor2.execute(f'select * from dados_enderecos WHERE cpf_dados_pessoais = "{et_cpf.get()}"')
+        cursor2.execute(f'select rua, numero, bairro, cidade, uf from dados_enderecos WHERE cpf_dados_pessoais = "{et_cpf.get()}"')
         dados_enderecos = cursor2.fetchall()
         lb_enderecos = Label(lf_resultado, text='Leitura de Endereços', justify='center')
         lb_enderecos.grid(row=1, column=1)
@@ -110,13 +110,12 @@ def lista_cadastros():
 
         for dados_pessoa in dados_pessoas:
             lb_pessoas['text'] += '\n' + str(dados_pessoa)
-
         conexao.close()
 
     def bc_endereco():
         conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
         cursor = conexao.cursor()
-        cursor.execute('select * from dados_enderecos')
+        cursor.execute('select rua, numero, bairro, cidade, uf from dados_enderecos')
         dados_enderecos = cursor.fetchall()
 
         lb_endereco = Label(lf_enderecos, text='Leitura de Endereços', justify='center')
