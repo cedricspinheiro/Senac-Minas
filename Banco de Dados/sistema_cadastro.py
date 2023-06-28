@@ -16,8 +16,8 @@ def criar_banco():
                     telefone TEXT,
                     data_nasc TEXT
                     )
-                   ''') 
-    
+                   ''')
+
     cursor.execute('''
                     CREATE TABLE IF NOT EXISTS enderecos_pessoas
                     (
@@ -65,7 +65,6 @@ def salvar_dados():
     conexao.close()
 
 def ler_dados():
-    
     global janela_ler, en_buscar, lb_pessoas, en_deletar, en_atualizar
 
     janela_ler = Tk()

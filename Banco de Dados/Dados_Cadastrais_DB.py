@@ -56,6 +56,88 @@ def save():
     euf.delete(0, 'end')
 
 def lista_cadastros():
+    def atualizar_cpf():
+        def gravar_alteracao():
+            conexao = sqlite3.connect('cadastro_alunos.db')
+            cursor = conexao.cursor()
+            cursor.execute(f'''
+                update dados_pessoais set
+                nome = '{enome_up.get()}',
+                cpf = '{et_cpf.get()}',
+                telefone = '{etelefone_up.get()}',
+                data = '{edata_up.get()}'
+                where cpf = '{et_cpf.get()}';
+            ''')
+
+            cursor1 = conexao.cursor()
+            cursor1.execute(f'''
+                            update dados_enderecosn set
+                            cpf_dados_pessoais = '{et_cpf.get()}'
+                            rua = '{erua_up.get()}',
+                            numero = '{enumero_up.get()}',
+                            bairro = '{ebairro_up.get()}',
+                            cidade = '{ecidade_up.get()}',
+                            uf = '{euf_up.get()}'
+                            where cpf_dados_pessoais = '{et_cpf.get()}';
+                            ''')
+            conexao.commit()
+            conexao.close()
+
+        Janela_atualizar = Tk()
+        dados_up = LabelFrame(Janela_atualizar, text='Dados Pessoais', font='Arial 14 italic')
+        dados_up.grid(row=0, column=0, sticky='we',padx=10, pady=10)
+        dados_up.config(padx=10, pady=10)
+
+        txnome_up = Label(dados_up, text='Nome:', anchor='e')
+        txnome_up.grid(row=0, column=0, sticky='we')
+        txcpf_up = Label(dados_up, text='CPF:', anchor='e')
+        txcpf_up.grid(row=1, column=0, sticky='we')
+        txtelefone_up= Label(dados_up, text='Telefone:', anchor='e')
+        txtelefone_up.grid(row=1, column=2, sticky='we')
+        txdata_up = Label(dados_up, text='Data de Nasc:')
+        txdata_up.grid(row=1, column=4, sticky='we')
+
+        enome_up = Entry(dados_up, width=100)
+        enome_up.grid(row=0, column=1, columnspan=5)
+        ecpf_up = Label(dados_up,text=str(et_cpf.get()), width=25)
+        ecpf_up.grid(row=1, column=1)
+        etelefone_up = Entry(dados_up, width=25)
+        etelefone_up.grid(row=1, column=3)
+        edata_up = Entry(dados_up, width=25)
+        edata_up.grid(row=1, column=5)
+
+        endereco_up= LabelFrame(Janela_atualizar, text='Endereço', font='Arial 14 italic')
+        endereco_up.grid(row=1, column=0, sticky='we', padx=10, pady=10)
+        endereco_up.config(pady=10, padx=10)
+
+        txrua_up = Label(endereco_up, text='Rua:', anchor='e')
+        txrua_up.grid(row=0, column=0, sticky='we')
+        txnumero_up = Label(endereco_up, text='Nº:', anchor='e')
+        txnumero_up.grid(row=0, column=4, sticky='we')
+        txbairro_up= Label(endereco_up, text='Bairro:', anchor='e')
+        txbairro_up.grid(row=1, column=0, sticky='we')
+        txcidade_up = Label(endereco_up, text='Cidade:', anchor='e')
+        txcidade_up.grid(row=1, column=2, sticky='we')
+        txuf_up = Label(endereco_up, text='UF:', anchor='e')
+        txuf_up.grid(row=1, column=4, sticky='we')
+
+        erua_up = Entry(endereco_up, width=80)
+        erua_up.grid(row=0, column=1, columnspan=3)
+        enumero_up = Entry(endereco_up, width=15)
+        enumero_up.grid(row=0, column=5)
+        ebairro_up = Entry(endereco_up, width=35)
+        ebairro_up.grid(row=1, column=1)
+        ecidade_up = Entry(endereco_up, width=35)
+        ecidade_up.grid(row=1, column=3)
+        euf_up = Entry(endereco_up, width=15)
+        euf_up.grid(row=1, column=5)
+
+        lf_botao = LabelFrame(Janela_atualizar, padx=10, pady=10)
+        lf_botao.grid(row=2, column=0, sticky='e')
+        bt_gravar = Button(lf_botao, text='Atualizar', command=gravar_alteracao)
+        bt_gravar.grid(row=0, column=1)
+
+        Janela_atualizar.mainloop()
     def deletar_cpf():
         global lb_pessoas
         global lb_enderecos
@@ -139,7 +221,9 @@ def lista_cadastros():
     bt_buscar = Button(lf_busca, text='Buscar', anchor='w', command=search)
     bt_buscar.grid(row=0, column=3, padx=10, pady=10)
     bt_deletar = Button(lf_busca, text='Deletar', anchor='w', command=deletar_cpf)
-    bt_deletar.grid(row=1, column=3, padx=10, pady=10)
+    bt_deletar.grid(row=0, column=4, padx=10, pady=10)
+    bt_atualizar = Button(lf_busca, text='Atualizar', anchor='w', command=atualizar_cpf)
+    bt_atualizar.grid(row=0, column=5, padx=10, pady=10)
 
     lf_lista = LabelFrame(janela_lista, text='Lista de Cadastros')
     lf_lista.grid(row=0, column=0, columnspan=2)
