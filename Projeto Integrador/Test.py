@@ -1,19 +1,15 @@
 from tkinter import *
 from PIL import Image, ImageTk
 
-pontos = 0
-
-def def_nicks():
-    arquivo_nick = 'Nick_Name.txt'
-    with open(arquivo_nick, 'r') as arquivo:
-        conteudo_nick = arquivo.read()
-    return conteudo_nick
+pontuacao = 0
+et_nick = 'NKKara'
 
 janela = Tk()
-janela.geometry('700x640')
-
+janela.title("Jogo da Forca")
+janela.geometry("700x640")
+janela.resizable(False, False)
 end_game = LabelFrame(janela)
-end_game.place(rely=0.5, relx=0.5, anchor=CENTER)
+#end_game.place(rely=0.5, relx=0.5, anchor=CENTER)
 
 imagem_end_game = Image.open("Game_Over.png")
 foto_end_game = ImageTk.PhotoImage(imagem_end_game)
@@ -31,8 +27,8 @@ def_nick.place(relx=0.4, rely=0.5, anchor=CENTER)
 lb_pontos = Label(end_game, text='Total:', font=("Arial", 18, "bold"))
 lb_pontos.place(relx=0.6, rely=0.5, anchor=CENTER)
 
-pontuação = Label(end_game, text=str(pontos), font=("Arial", 18, "bold"))
-pontuação.place(relx=0.8, rely=0.5, anchor=CENTER)
+pontuacao = Label(end_game, text=str(pontos), font=("Arial", 18, "bold"))
+pontuacao.place(relx=0.8, rely=0.5, anchor=CENTER)
 
 restart_game = Button(end_game, text='Restart', anchor=CENTER, command=restart)
 restart_game.place(relx=0.5, rely=0.7)

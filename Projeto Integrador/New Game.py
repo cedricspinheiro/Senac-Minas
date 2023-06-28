@@ -5,6 +5,7 @@ import sqlite3
 
 contador_erradas = 0
 pontuacao = 0
+pontos = 0
 
 def BANCO():
     conexao = sqlite3.connect('Banco_pontuacao.db')
@@ -56,13 +57,13 @@ def mostrar_tela_forca():
     tela_nick_name.destroy()
     tela_forca.place(relx=0.5, rely=0.5, anchor=CENTER)
     lb_nick = Label(janela, text='Nick:', anchor=CENTER)
-    lb_nick.place(relx=0.20, rely=0.05)
+    lb_nick.place(relx=0.20, rely=0.015)
     nick = Label(janela, text=et_nick, anchor=CENTER)
-    nick.place(relx=0.40, rely=0.05)
+    nick.place(relx=0.40, rely=0.015)
     pontos = Label(janela, text='Pontuação', anchor=CENTER)
-    pontos.place(relx=0.60, rely=0.05)
+    pontos.place(relx=0.60, rely=0.015)
     lb_pontos = Label(janela, text=pontuacao, anchor=CENTER)
-    lb_pontos.place(relx=0.80, rely=0.05)
+    lb_pontos.place(relx=0.80, rely=0.015)
 def abrir_rank():
     conexao = sqlite3.connect('Banco_pontuacao.db')
     cursor = conexao.cursor()
@@ -70,6 +71,16 @@ def abrir_rank():
     dados = cursor.fetchall()
     conexao.close()
     return dados
+
+def restart():
+    end_game.destroy()
+    tela_new_game.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+def def_nicks():
+    arquivo_nick = 'Nick_Name.txt'
+    with open(arquivo_nick, 'r') as arquivo:
+        conteudo_nick = arquivo.read()
+    return conteudo_nick
 
 
 
@@ -81,8 +92,8 @@ janela.resizable(False, False)
 tela_new_game = LabelFrame(janela)
 tela_new_game.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-imagem_new_game = Image.open("/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/New_Game.jpg")
-#imagem_new_game = Image.open("New_Game.jpg")
+#imagem_new_game = Image.open("/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/New_Game.jpg")
+imagem_new_game = Image.open("New_Game.jpg")
 imagem_new_game = imagem_new_game.resize((200, 200))
 foto_new_game = ImageTk.PhotoImage(imagem_new_game)
 label_new_game = Label(tela_new_game, image=foto_new_game)
@@ -116,8 +127,8 @@ tela_forca = LabelFrame(janela)
 quadro_imagem_forca = LabelFrame(tela_forca)
 quadro_imagem_forca.grid(row=0, column=0, sticky='nswe')
 
-imagem_forca = Image.open("/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/Tela_Game.png")
-#imagem_forca = Image.open("Tela_Game.png")
+#imagem_forca = Image.open("/home/nkkara/Documentos/Repertorios/Senac Minas/Projeto Integrador/Tela_Game.png")
+imagem_forca = Image.open("Tela_Game.png")
 imagem_forca = imagem_forca.resize((200, 200))
 foto_forca = ImageTk.PhotoImage(imagem_forca)
 label_forca = Label(quadro_imagem_forca, image=foto_forca)
@@ -132,7 +143,7 @@ quadro_letras_erradas.grid(row=0, column=1, sticky='nswe')
 letras_erradas = Label(quadro_letras_erradas, text='Letras Erradas:')
 letras_erradas.grid(row=0, padx=10, pady=10, sticky='w')
 
-letras_erradas_label = Label(quadro_letras_erradas, text=letras_erradas_var, font=("Arial", 18, "bold"), fg="red")
+letras_erradas_label = Label(quadro_letras_erradas, text='', font=("Arial", 18, "bold"), fg="red")
 letras_erradas_label.grid(row=1, padx=10, pady=10, sticky='w')
 
 quadro_palavra_secreta = LabelFrame(tela_forca)
@@ -188,6 +199,31 @@ for i in range(1, 21):
     ranked_entry.grid(row=i, column=1, padx=5, pady=2.5)
     ranked_entries.append(ranked_entry)
 
+
+end_game = LabelFrame(janela)
+#end_game.place(rely=0.5, relx=0.5, anchor=CENTER)
+
+imagem_end_game = Image.open("Game_Over.png")
+foto_end_game = ImageTk.PhotoImage(imagem_end_game)
+label_new_game = Label(end_game, image=foto_end_game)
+label_new_game.grid(row=0, column=0, padx=10, pady=10)
+
+conteudo_nick = def_nicks()
+
+lb_nick = Label(end_game, text='Nick:', font=("Arial", 18, "bold"))
+lb_nick.place(relx=0.2, rely=0.5, anchor=CENTER)
+
+def_nick = Label(end_game, text=conteudo_nick, font=("Arial", 18))
+def_nick.place(relx=0.4, rely=0.5, anchor=CENTER)
+
+lb_pontos = Label(end_game, text='Total:', font=("Arial", 18, "bold"))
+lb_pontos.place(relx=0.6, rely=0.5, anchor=CENTER)
+
+pontuacao = Label(end_game, text=str(pontos), font=("Arial", 18, "bold"))
+pontuacao.place(relx=0.8, rely=0.5, anchor=CENTER)
+
+restart_game = Button(end_game, text='Restart', anchor=CENTER, command=restart)
+restart_game.place(relx=0.5, rely=0.7)
 
 
 janela.mainloop()

@@ -1,4 +1,3 @@
-
 import sqlite3
 from tkinter import *
 
@@ -30,6 +29,7 @@ def criar_banco():
     conexao.commit()
     conexao.close()
 
+
 def save():
     conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
     cursor = conexao.cursor()
@@ -55,10 +55,11 @@ def save():
     ecidade.delete(0, 'end')
     euf.delete(0, 'end')
 
+
 def lista_cadastros():
     def atualizar_cpf():
         def gravar_alteracao():
-            conexao = sqlite3.connect('cadastro_alunos.db')
+            conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
             cursor = conexao.cursor()
             cursor.execute(f'''
                 update dados_pessoais set
@@ -71,8 +72,8 @@ def lista_cadastros():
 
             cursor1 = conexao.cursor()
             cursor1.execute(f'''
-                            update dados_enderecosn set
-                            cpf_dados_pessoais = '{et_cpf.get()}'
+                            update dados_enderecos set
+                            cpf_dados_pessoais = '{et_cpf.get()}',
                             rua = '{erua_up.get()}',
                             numero = '{enumero_up.get()}',
                             bairro = '{ebairro_up.get()}',
@@ -85,28 +86,28 @@ def lista_cadastros():
 
         Janela_atualizar = Tk()
         dados_up = LabelFrame(Janela_atualizar, text='Dados Pessoais', font='Arial 14 italic')
-        dados_up.grid(row=0, column=0, sticky='we',padx=10, pady=10)
+        dados_up.grid(row=0, column=0, sticky='we', padx=10, pady=10)
         dados_up.config(padx=10, pady=10)
 
         txnome_up = Label(dados_up, text='Nome:', anchor='e')
         txnome_up.grid(row=0, column=0, sticky='we')
         txcpf_up = Label(dados_up, text='CPF:', anchor='e')
         txcpf_up.grid(row=1, column=0, sticky='we')
-        txtelefone_up= Label(dados_up, text='Telefone:', anchor='e')
+        txtelefone_up = Label(dados_up, text='Telefone:', anchor='e')
         txtelefone_up.grid(row=1, column=2, sticky='we')
         txdata_up = Label(dados_up, text='Data de Nasc:')
         txdata_up.grid(row=1, column=4, sticky='we')
 
         enome_up = Entry(dados_up, width=100)
         enome_up.grid(row=0, column=1, columnspan=5)
-        ecpf_up = Label(dados_up,text=str(et_cpf.get()), width=25)
+        ecpf_up = Label(dados_up, text=str(et_cpf.get()), width=25)
         ecpf_up.grid(row=1, column=1)
         etelefone_up = Entry(dados_up, width=25)
         etelefone_up.grid(row=1, column=3)
         edata_up = Entry(dados_up, width=25)
         edata_up.grid(row=1, column=5)
 
-        endereco_up= LabelFrame(Janela_atualizar, text='Endereço', font='Arial 14 italic')
+        endereco_up = LabelFrame(Janela_atualizar, text='Endereço', font='Arial 14 italic')
         endereco_up.grid(row=1, column=0, sticky='we', padx=10, pady=10)
         endereco_up.config(pady=10, padx=10)
 
@@ -114,7 +115,7 @@ def lista_cadastros():
         txrua_up.grid(row=0, column=0, sticky='we')
         txnumero_up = Label(endereco_up, text='Nº:', anchor='e')
         txnumero_up.grid(row=0, column=4, sticky='we')
-        txbairro_up= Label(endereco_up, text='Bairro:', anchor='e')
+        txbairro_up = Label(endereco_up, text='Bairro:', anchor='e')
         txbairro_up.grid(row=1, column=0, sticky='we')
         txcidade_up = Label(endereco_up, text='Cidade:', anchor='e')
         txcidade_up.grid(row=1, column=2, sticky='we')
@@ -138,6 +139,7 @@ def lista_cadastros():
         bt_gravar.grid(row=0, column=1)
 
         Janela_atualizar.mainloop()
+
     def deletar_cpf():
         global lb_pessoas
         global lb_enderecos
@@ -172,7 +174,8 @@ def lista_cadastros():
             lb_pessoas['text'] += '\n' + str(dados_pessoa)
 
         cursor2 = conexao.cursor()
-        cursor2.execute(f'select rua, numero, bairro, cidade, uf from dados_enderecos WHERE cpf_dados_pessoais = "{et_cpf.get()}"')
+        cursor2.execute(
+            f'select rua, numero, bairro, cidade, uf from dados_enderecos WHERE cpf_dados_pessoais = "{et_cpf.get()}"')
         dados_enderecos = cursor2.fetchall()
         lb_enderecos = Label(lf_resultado, text='Leitura de Endereços', justify='center')
         lb_enderecos.grid(row=1, column=1)
@@ -205,7 +208,6 @@ def lista_cadastros():
 
         for dados_endereco in dados_enderecos:
             lb_endereco['text'] += '\n' + str(dados_endereco)
-
 
     janela_lista = Tk()
     janela_lista.title('Lista de Cadastros')
@@ -241,10 +243,11 @@ def lista_cadastros():
 
     janela_lista.mainloop()
 
+
 janela = Tk()
 janela.title('Cadastro')
 janela.config(borderwidth=10)
-#janela.option_add('*Font', 'Arial 8 bold')
+# janela.option_add('*Font', 'Arial 8 bold')
 
 dados = LabelFrame(janela, text='Dados Pessoais', font='Arial 14 italic')
 dados.grid(row=0, column=0, sticky='we', columnspan=5)
