@@ -1,22 +1,7 @@
 contador_erradas = 0
 pontuacao = 0
 pontos = 0
-def mostrar_tela_nick():
-    tela_new_game.destroy()
-    tela_nick_name.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-def mostrar_tela_forca():
-    et_nick = nick_entry.get()  # Definir et_nick antes de utilizá-lo
-    tela_nick_name.destroy()
-    tela_forca.place(relx=0.5, rely=0.5, anchor=CENTER)
-            lb_nick = Label(janela, text='Nick:', anchor=CENTER)
-            lb_nick.place(relx=0.20, rely=0.015)
-            nick = Label(janela, text=et_nick, anchor=CENTER)
-            nick.place(relx=0.40, rely=0.015)
-            pontos = Label(janela, text='Pontuação', anchor=CENTER)
-            pontos.place(relx=0.60, rely=0.015)
-            lb_pontos = Label(janela, text=pontuacao, anchor=CENTER)
-            lb_pontos.place(relx=0.80, rely=0.015)
 
 def abrir_rank():
     conexao = sqlite3.connect('Banco_pontuacao.db')
@@ -26,26 +11,6 @@ def abrir_rank():
     conexao.close()
     return dados
 
-def restart():
-    end_game.destroy()
-    tela_new_game.place(relx=0.5, rely=0.5, anchor=CENTER)
-
-def def_nicks():
-    arquivo_nick = 'Nick_Name.txt'
-    with open(arquivo_nick, 'r') as arquivo:
-        conteudo_nick = arquivo.read()
-    return conteudo_nick
-
-
-
-
-
-
-salvar_letra = Button(quadro_entrada_letra, text="Verificar", anchor="center", command=verificar_letra)
-salvar_letra.grid(padx=10, pady=10)
-salvar_letra.configure(background="black", foreground="white", activebackground="white", activeforeground="black")
-
-quadro_entrada_letra.grid_columnconfigure(0, weight=1)
 
 quadro_rank = LabelFrame(tela_forca)
 quadro_rank.grid(row=0, column=2, rowspan=3, sticky='nswe', padx=10, pady=10)
