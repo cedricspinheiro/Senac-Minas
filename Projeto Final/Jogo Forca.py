@@ -156,7 +156,7 @@ def verificar():
 
 def palavra_secreta():
     global texto_oculto, texto_original
-    texto_original = 'PARALELEPIPEDO'
+    texto_original = 'ARARA'
     texto_oculto = '*' * len(texto_original)
 
 palavra_secreta()
@@ -237,7 +237,7 @@ def tela_forca(nick):
         lb_rank.grid(row=i, column=0, padx=1, pady=1, sticky='we')
 
 def tela_win():
-    global nick_value, pontos_value
+    global nick_value, pontos_value, im_win_game, ft_win_game, lb_win_game
 
     limpar_janela()
 
