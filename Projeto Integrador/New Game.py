@@ -3,46 +3,9 @@ pontuacao = 0
 pontos = 0
 
 
-def abrir_rank():
-    conexao = sqlite3.connect('Banco_pontuacao.db')
-    cursor = conexao.cursor()
-    cursor.execute("SELECT * FROM Pontuação")
-    dados = cursor.fetchall()
-    conexao.close()
-    return dados
-
-
-quadro_rank = LabelFrame(tela_forca)
-quadro_rank.grid(row=0, column=2, rowspan=3, sticky='nswe', padx=10, pady=10)
-
-rank = Label(quadro_rank, text='Rank')
-rank.grid(padx=10, pady=10)
-BANCO()
-dados = abrir_rank()
-
-ranked_labels = []
-for i in range(1, 21):
-    ranked_label = Label(quadro_rank, text=f'{i}º', anchor='e')
-    ranked_label.grid(padx=1, pady=1, sticky='e')
-    ranked_labels.append(ranked_label)
-
-
-abrir_rank()
-
-ranked_entries = []
-for i in range(1, 21):
-    if i <= len(dados):
-        ranked_entry = Entry(quadro_rank)
-        ranked_entry.insert(END, dados[i-1])
-    else:
-        ranked_entry = Entry(quadro_rank, state='readonly')
-    ranked_entry.config(state='readonly')
-    ranked_entry.grid(row=i, column=1, padx=5, pady=2.5)
-    ranked_entries.append(ranked_entry)
-
 
 end_game = LabelFrame(janela)
-#end_game.place(rely=0.5, relx=0.5, anchor=CENTER)
+end_game.place(rely=0.5, relx=0.5, anchor=CENTER)
 
 imagem_end_game = Image.open("Game_Over.png")
 foto_end_game = ImageTk.PhotoImage(imagem_end_game)

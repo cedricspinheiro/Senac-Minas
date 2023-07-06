@@ -132,7 +132,6 @@ def exibir_conteudo():
         lb_autor_salvas['text'] += '\n' + str(autor).replace("'", "")
 
     conexao.close()
-
 exibir_conteudo()
 
 
@@ -175,6 +174,9 @@ def atualizar_conteudo(en_pesquisa):
             conexao.close()
             atualizacao.destroy()
             en_pesquisa.delete(0, END)
+            exibir_conteudo.destroy()
+            exibir_conteudo()
+
 
         
         def deletar_edicao():
@@ -188,15 +190,21 @@ def atualizar_conteudo(en_pesquisa):
             conexao.close()
             atualizacao.destroy()
             en_pesquisa.delete(0, END)
+            exibir_conteudo.destroy()
+            exibir_conteudo()
 
 
 
         
     elif resultado == None:
         messagebox.showinfo("Caixa de Pesquisa Vazia", "Por favor, digite a palavra desejada.")
+        exibir_conteudo.destroy()
+        exibir_conteudo()
+
     else:
         messagebox.showinfo("Palavra não encontrada", "A palavra não foi encontrada no banco de palavras.")
-
+        exibir_conteudo.destroy()
+        exibir_conteudo()
     lb_palavra = tk.Label(atualizacao, text="Palavra:")
     lb_palavra.pack()
     en_palavra = tk.Entry(atualizacao, textvariable=nova_palavra)
@@ -217,7 +225,6 @@ def atualizar_conteudo(en_pesquisa):
     bt_deletar = tk.Button(atualizacao, text="Deletar", command=deletar_edicao)
     bt_deletar.pack()
     
-
 
 
 cadastro.mainloop()
