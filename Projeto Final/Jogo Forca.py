@@ -3,6 +3,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 import sqlite3
 import random
+import tkinter.messagebox as messagebox
 
 ### VARIAVES ###
 PONTOS = 0
@@ -73,7 +74,7 @@ def zerar_rank():
     cursor.execute('drop table Pontuação')
     conexao.commit()
     conexao.close()
-    print('Rank Zerado!')
+    messagebox.showinfo('Rank Zerado', 'O ranking foi zerado com sucesso!')
 
 
 def limpar_janela():
@@ -245,47 +246,47 @@ def tela_win():
     lf_win_game.place(relx=0.5, rely=0.5, anchor=CENTER)
     
     lb_vitoria = Label(lf_win_game, text="Parabéns, você venceu!", font=("Arial", 16, "bold"))
-    lb_vitoria.pack(pady=20)
-
-    lb_nick = Label(lf_win_game, text="Nick: " + nick_value.get(), font=("Arial", 12))
-    lb_nick.pack()
-
-    lb_pontos = Label(lf_win_game, text="Pontuação: " + pontos_value.get(), font=("Arial", 12))
-    lb_pontos.pack()
+    lb_vitoria.grid(row=0 , column=0, columnspan=2, padx=10, pady=10)
 
     im_win_game = Image.open("Senac-Minas\Projeto Final\Imagens\Win_Game.jpg")
     ft_win_game = ImageTk.PhotoImage(im_win_game)
     lb_win_game = Label(lf_win_game, image=ft_win_game)
-    lb_win_game.grid(row=1, column=1,columnspan=4, padx=10, pady=10)
+    lb_win_game.grid(row=1, column=0,columnspan=2, padx=10, pady=10)
+    
+    bt_continuar = Button(lf_win_game, text='Enfrentar SEUS MEDOS')
+    bt_continuar.grid(row=2, column='0', padx=10, pady=10)
+    bt_game_over = Button(lf_win_game, text='Sucumbir AO MEDO!', command=end_game)
+    bt_game_over.grid(row=2, column='1', padx=10, pady=10)
+    
+    lb_nick = Label(lf_win_game, text="Nick: " + nick_value.get(), font=("Arial", 12))
+    lb_nick.place(relx=0.2, rely=0.1)
+
+    lb_pontos = Label(lf_win_game, text="Pontuação: " + pontos_value.get(), font=("Arial", 12))
+    lb_pontos.place(relx=0.6, rely=0.1)
+
     
 
 
 def end_game():
-    pass
-    end_game = LabelFrame(janela)
+    global im_end_game, ft_end_game, lb_end_game
+    limpar_janela
+    end_game = LabelFrame(menu_game)
     end_game.place(rely=0.5, relx=0.5, anchor=CENTER)
 
-    imagem_end_game = Image.open("Game_Over.png")
-    foto_end_game = ImageTk.PhotoImage(imagem_end_game)
-    label_new_game = Label(end_game, image=foto_end_game)
-    label_new_game.grid(row=0, column=0, padx=10, pady=10)
+    im_end_game = Image.open("Senac-Minas\Projeto Final\Imagens\Game_Over.png")
+    ft_end_game = ImageTk.PhotoImage(im_end_game)
+    lb_end_game = Label(end_game, image=ft_end_game)
+    lb_end_game.grid(row=0, column=0, padx=10, pady=10)
 
-    conteudo_nick = def_nicks()
 
-    lb_nick = Label(end_game, text='Nick:', font=("Arial", 18, "bold"))
-    lb_nick.place(relx=0.2, rely=0.5, anchor=CENTER)
+    lb_nick = Label(end_game, text="Nick: " + nick_value.get(), font=("Arial", 18, "bold"))
+    lb_nick.place(relx=0.3, rely=0.5, anchor=CENTER)
 
-    def_nick = Label(end_game, text=conteudo_nick, font=("Arial", 18))
-    def_nick.place(relx=0.4, rely=0.5, anchor=CENTER)
+    lb_pontos = Label(end_game, text="Pontuação: " + pontos_value.get(), font=("Arial", 18, "bold"))
+    lb_pontos.place(relx=0.7, rely=0.5, anchor=CENTER)
 
-    lb_pontos = Label(end_game, text='Total:', font=("Arial", 18, "bold"))
-    lb_pontos.place(relx=0.6, rely=0.5, anchor=CENTER)
-
-    pontuacao = Label(end_game, text=str(pontos), font=("Arial", 18, "bold"))
-    pontuacao.place(relx=0.8, rely=0.5, anchor=CENTER)
-
-    restart_game = Button(end_game, text='Restart', anchor=CENTER, command=restart)
-    restart_game.place(relx=0.5, rely=0.7)
+    restart_game = Button(end_game, text='Restart', anchor=CENTER, command=menu)
+    restart_game.place(relx=0.45, rely=0.7)
 
 
 
