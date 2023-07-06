@@ -3,19 +3,24 @@ from tkinter import *
 from PIL import Image, ImageTk
 import sqlite3
 import random
+import tkinter as tk
+from tkinter import Tk, Toplevel, Label, Button
+from tkinter import messagebox
 import tkinter.messagebox as messagebox
 
 ### VARIAVES ###
 PONTOS = 0
+ERROS = 0
 row = 1
 col_name = 1
 col_points = 2
+lb_segredo = None  # Variável global para armazenar o widget Label lb_segredo
 ### FIM DAS VARIAVEIS ###
 
 ### TELA E TAMANHO DEFINIDA ###
 menu_game = Tk()
 menu_game.title("Jogo da Forca")
-menu_game.geometry("700x640")
+menu_game.geometry("750x690")
 menu_game.resizable(False, False)
 
 
@@ -31,9 +36,215 @@ def BANCO():
                 pontos integer
             )
             """)
+    cursorP = conexao.cursor()
+    cursorP.execute("""
+                   create table if not exists Palavras (
+                       Palavra text primary key not null,
+                       Dica text not null,
+                       Autor text not null
+                   )
+                   """)
     conexao.close()
 
 
+def salvar_conteudo():
+    global txt_cadastro_palavras, txt_cadastro_dica, txt_cadastro_autor
+    txt_cadastro_palavras = en_cadastro_palavras.get().upper()
+    txt_cadastro_dica = en_cadastro_dica.get().upper()
+    txt_cadastro_autor = en_cadastro_autor.get()
+    
+    if txt_cadastro_autor == "":
+        txt_cadastro_autor = "Autor Anônimo"
+    
+    conexao = sqlite3.connect('Senac-Minas/Projeto Final/Banco/Banco_de_Dados.db')
+    cursor = conexao.cursor()
+    cursor.execute("""
+                   INSERT INTO Palavras (Palavra, Dica, Autor)
+                   VALUES (?, ?, ?);
+                   """, (txt_cadastro_palavras, txt_cadastro_dica, txt_cadastro_autor))
+    conexao.commit()
+    conexao.close()
+    
+    en_cadastro_palavras.delete(0, END)
+    en_cadastro_dica.delete(0, END)
+    en_cadastro_autor.delete(0, END)
+    
+    exibir_conteudo()
+    print("Conteúdo salvo com sucesso!")
+
+
+def limpar_janela():
+    for widget in menu_game.winfo_children():
+        widget.destroy()
+
+
+def atualizar_conteudo(en_pesquisa):
+    palavra_pesquisada = en_pesquisa.get().upper()
+    conexao = sqlite3.connect("Senac-Minas\Projeto Final\Banco\Banco_de_Dados.db")
+    cursor = conexao.cursor()
+    cursor.execute(f"SELECT Palavra, Dica, Autor FROM Palavras WHERE Palavra = '{palavra_pesquisada}'")
+    resultado = cursor.fetchone()
+    if resultado:
+        palavra, dica, autor = resultado
+        conexao.close()
+        atualizacao = tk.Toplevel()
+        atualizacao.title("Atualizar Conteúdo")
+        atualizacao.geometry("300x300")
+        atualizacao.grab_set()
+        atualizacao.transient(menu_game)
+
+        nova_palavra = tk.StringVar(value=palavra)
+        nova_dica = tk.StringVar(value=dica)
+        novo_autor = tk.StringVar(value=autor)
+
+        def salvar_edicao():
+            nova_palavra_valor = nova_palavra.get().upper()
+            nova_dica_valor = nova_dica.get().upper()
+            novo_autor_valor = novo_autor.get()
+
+            atualizacao.destroy()
+
+            conexao = sqlite3.connect("Senac-Minas\Projeto Final\Banco\Banco_de_Dados.db")
+            cursor = conexao.cursor()
+            cursor.execute(f"""
+                UPDATE Palavras
+                SET Palavra = '{nova_palavra_valor}',
+                    Dica = '{nova_dica_valor}',
+                    Autor = '{novo_autor_valor}'
+                WHERE Palavra = '{palavra}'
+            """)
+            conexao.commit()
+            conexao.close()
+            atualizacao.destroy()
+            en_pesquisa.delete(0, END)
+            exibir_conteudo.destroy()
+            exibir_conteudo()
+        
+        def deletar_edicao():
+            conexao = sqlite3.connect("Senac-Minas\Projeto Final\Banco\Banco_de_Dados.db")
+            cursor = conexao.cursor()
+            cursor.execute(f"""
+                           DELETE FROM Palavras
+                           where Palavra = '{palavra}'
+                           """)
+            conexao.commit()
+            conexao.close()
+            atualizacao.destroy()
+            en_pesquisa.delete(0, END)
+            exibir_conteudo.destroy()
+            exibir_conteudo()
+
+
+
+        
+    elif resultado == None:
+        messagebox.showinfo("Caixa de Pesquisa Vazia", "Por favor, digite a palavra desejada.")
+        exibir_conteudo.destroy()
+        exibir_conteudo()
+
+    else:
+        messagebox.showinfo("Palavra não encontrada", "A palavra não foi encontrada no banco de palavras.")
+        exibir_conteudo.destroy()
+        exibir_conteudo()
+    lb_palavra = tk.Label(atualizacao, text="Palavra:")
+    lb_palavra.pack()
+    en_palavra = tk.Entry(atualizacao, textvariable=nova_palavra)
+    en_palavra.pack()
+
+    lb_dica = tk.Label(atualizacao, text="Dica:")
+    lb_dica.pack()
+    en_dica = tk.Entry(atualizacao, textvariable=nova_dica)
+    en_dica.pack()
+
+    lb_autor = tk.Label(atualizacao, text="Autor:")
+    lb_autor.pack()
+    en_autor = tk.Entry(atualizacao, textvariable=novo_autor)
+    en_autor.pack()
+
+    bt_salvar = tk.Button(atualizacao, text="Salvar", command=salvar_edicao)
+    bt_salvar.pack()
+    bt_deletar = tk.Button(atualizacao, text="Deletar", command=deletar_edicao)
+    bt_deletar.pack()
+
+
+def cadastro_palavras():
+    global lf_tela_toda, im_cadastro, ft_cadastro, lb_im_foto, lf_BANCO, en_cadastro_palavras, en_cadastro_dica, en_cadastro_autor, lf_resumo
+    limpar_janela()
+    lf_tela_toda = LabelFrame(menu_game)
+    lf_tela_toda.place(relx=0.5, rely=0.5, anchor=CENTER)
+    lf_cadastro_palavras = LabelFrame(lf_tela_toda, text='Cadastre uma palavra e descrição!', labelanchor='n', font=("Arial", 12, "bold"))
+    lf_cadastro_palavras.grid(row=0, rowspan=2, column=0, sticky='nswe', padx=10, pady=10)
+    lf_pesquisa = LabelFrame(lf_tela_toda, text='Consulta', labelanchor='n', font=("Arial", 12, "bold"))
+    lf_pesquisa.grid(row=0, column=1, sticky='we', padx=10, pady=10)
+
+    lf_BANCO = LabelFrame(lf_tela_toda, text='Banco de Palavras e suas Descrições!', labelanchor='n', font=("Arial", 12, "bold"))
+    lf_BANCO.grid(row=1,rowspan=2, column=1, sticky='nswe', padx=10, pady=10)
+    lf_im_BANCO = LabelFrame(lf_tela_toda, text='Porque está tão sério?', labelanchor='n', font=("Arial", 12, "bold"))
+    lf_im_BANCO.grid(row=2,rowspan=2, column=0, sticky='nswe', padx=10, pady=10)
+    bt_voltar = Button(lf_tela_toda, text='Voltar', command=menu)
+    bt_voltar.grid(row=3, column=1, padx=10, pady=10)
+    lb_cadastro_palavras = Label(lf_cadastro_palavras, text='Digite uma palavra:', anchor=CENTER, font=("Arial", 12, "bold"))
+    lb_cadastro_palavras.grid(row=0,column=0, sticky='we')
+    en_cadastro_palavras = Entry(lf_cadastro_palavras)
+    en_cadastro_palavras.grid(row=0, column=1, sticky='we', padx=10, pady=10)
+    lb_cadastro_dica = Label(lf_cadastro_palavras, text='Dica:', anchor=CENTER, font=("Arial", 12, "bold"))
+    lb_cadastro_dica.grid(row=1, column=0, sticky='we', padx=10, pady=10)
+    en_cadastro_dica = Entry(lf_cadastro_palavras)
+    en_cadastro_dica.grid(row=1, column=1, sticky='we', padx=10, pady=10)
+    lb_cadastro_autor = Label(lf_cadastro_palavras, text='Autor:', anchor=CENTER, font=("Arial", 12, "bold"))
+    lb_cadastro_autor.grid(row=2, column=0, sticky='we', padx=10, pady=10)
+    en_cadastro_autor = Entry(lf_cadastro_palavras)
+    en_cadastro_autor.grid(row=2, column=1, sticky='we', padx=10, pady=10)
+
+    bt_cadastro_conteudo = Button(lf_cadastro_palavras, text='Cadastrar', command=salvar_conteudo)
+    bt_cadastro_conteudo.grid(row=3, column=1, sticky='we', padx=10, pady=10)
+
+    lb_pesquisa = Label(lf_pesquisa, text='Pesquisa:', anchor='e', font=("Arial", 12, "bold"))
+    lb_pesquisa.grid(row=0, column=0, sticky='we') 
+    en_pesquisa = Entry(lf_pesquisa)
+    en_pesquisa.grid(row=0, column=1, sticky='we')
+    bt_pesquisa = tk.Button(lf_pesquisa, text='Pesquisar', command=lambda: atualizar_conteudo(en_pesquisa))
+    bt_pesquisa.grid(row=0, column=2, sticky='we')   
+    
+    im_cadastro = Image.open("Senac-Minas\Projeto Final\Imagens\End.jpg").resize((241, 360))
+    ft_cadastro = ImageTk.PhotoImage(im_cadastro)
+    lb_im_foto = Label(lf_im_BANCO, image=ft_cadastro)
+    lb_im_foto.grid(row=0, column=0, sticky='nswe', padx=10, pady=10)
+    exibir_conteudo()
+
+def exibir_conteudo():
+    global lb_dicas_salvas, lb_Palavras_salvas, lb_autor_salvas, lf_BANCO
+    conexao = sqlite3.connect("Senac-Minas\Projeto Final/Banco/Banco_de_Dados.db")
+
+    cursor1 = conexao.cursor()
+    cursor1.execute("SELECT palavra FROM Palavras ORDER BY rowid")
+    lb_Palavras_salvas = Label(lf_BANCO, text='Palavras', justify='center')
+    lb_Palavras_salvas.grid(row=0, column=0, sticky='we')
+    lb_Palavras_salvas = Label(lf_BANCO, text='Palavras', justify='center')
+    lb_Palavras_salvas.grid(row=0, column=0, sticky='we')
+    palavras_salvas = cursor1.fetchall() 
+    for palavras in palavras_salvas:
+        lb_Palavras_salvas['text'] += '\n' + str(palavras).replace("'", "")   
+
+    cursor2 = conexao.cursor()
+    cursor2.execute("SELECT Dica FROM Palavras ORDER BY rowid")
+    lb_dicas_salvas = Label(lf_BANCO, text='Dicas', justify='center')
+    lb_dicas_salvas.grid(row=0, column=1, sticky='we')    
+    dicas_salvas = cursor2.fetchall()
+    for dicas in dicas_salvas:
+        lb_dicas_salvas['text'] += '\n' + str(dicas).replace("'", "")
+
+    cursor3 = conexao.cursor()
+    cursor3.execute("SELECT Autor FROM Palavras ORDER BY rowid")
+    lb_autor_salvas = Label(lf_BANCO, text='Autores', justify='center')
+    lb_autor_salvas.grid(row=0, column=2, sticky='we')
+    autores_salvos = cursor3.fetchall()
+    for autor in autores_salvos:
+        lb_autor_salvas['text'] += '\n' + str(autor).replace("'", "")
+
+    conexao.close()
+    
+    
 def exibir_rank():
     global lb_nome, lb_pontos
 
@@ -48,10 +259,6 @@ def exibir_rank():
 
     resultado_classificado = sorted(resultado, key=lambda x: x[2], reverse=True)
     
-    lb_nome = Label(lf_rank, text="Nome", anchor='center')
-    lb_nome.grid(row=0, column=1)
-    lb_pontos = Label(lf_rank, text="Pontos", anchor='center')
-    lb_pontos.grid(row=0, column=2)
 
     row = 1
 
@@ -60,10 +267,10 @@ def exibir_rank():
         pontos = posicao[2]
 
         lb_nome = Label(lf_rank, text=nome, anchor='center')
-        lb_nome.grid(row=row, column=1, padx=10, pady=5)
+        lb_nome.grid(row=row, column=1, padx=10, pady=2.5)
 
         lb_pontos = Label(lf_rank, text=pontos, anchor='center')
-        lb_pontos.grid(row=row, column=2, padx=10, pady=5)
+        lb_pontos.grid(row=row, column=2, padx=10, pady=2.5)
 
         row += 1
 
@@ -76,10 +283,6 @@ def zerar_rank():
     conexao.close()
     messagebox.showinfo('Rank Zerado', 'O ranking foi zerado com sucesso!')
 
-
-def limpar_janela():
-    for widget in menu_game.winfo_children():
-        widget.destroy()
 
 
 def menu():
@@ -101,6 +304,10 @@ def menu():
     bt_zerar_rank = Button(lf_menu_game, text='clear game', anchor='center', command=zerar_rank)
     bt_zerar_rank.grid(row=1, column=1, padx=10, pady=10, sticky='nswe')
 
+    bt_cadastro = Button(menu_game, text='Cadastrar palavra', anchor='center', command=cadastro_palavras)
+    bt_cadastro.grid(row=0, column=0, padx=10, pady=10)
+    bt_teste = Button(menu_game, text="Testar LFrames", anchor='center', command=test_do_testando)
+    bt_teste.grid(row=1, column=0, padx=10, pady=10)
 
 def tela_nick():
     global en_nick
@@ -122,7 +329,7 @@ def tela_nick():
 
 
 def verificar():
-    global texto_oculto, PONTOS, pontos_value
+    global texto_oculto, PONTOS, pontos_value, ERROS
 
     letra = en_entrada_letra.get().upper()
     nova_palavra = ""
@@ -142,30 +349,53 @@ def verificar():
 
     if texto_original == nova_palavra:
         PONTOS += 100
-        pontos_value.set(str(PONTOS))  # Adicionado para atualizar os pontos
+        pontos_value.set(str(PONTOS))  # Atualizar a pontuação na interface gráfica
         tela_win()  # Chamar a função win_game se todas as letras foram acertadas
 
     texto_oculto = nova_palavra
     lb_segredo.config(text=texto_oculto)
     en_entrada_letra.delete(0, END)
 
+    # Incrementar a variável ERROS se a letra não estiver na palavra
+    if letra not in texto_original:
+        ERROS += 1
+        lb_letras_erradas.config(text=lb_letras_erradas.cget('text') + letra + '\n')
 
-
-
-
+    # Verificar se o número de erros é igual a 7
+    if ERROS == 7:
+        end_game()
 
 
 def palavra_secreta():
     global texto_oculto, texto_original
-    texto_original = 'ARARA'
-    texto_oculto = '*' * len(texto_original)
+
+    conexao = sqlite3.connect('Senac-Minas/Projeto Final/Banco/Banco_de_Dados.db')
+    cursor = conexao.cursor()
+    cursor.execute("SELECT Palavra FROM Palavras")
+    palavras = cursor.fetchall()
+    conexao.close()
+
+    # Selecionar uma palavra aleatória
+    palavra = random.choice(palavras)[0]
+
+    # Verificar se a palavra contém espaços ou hífens
+    if ' ' in palavra:
+        texto_original = palavra
+    else:
+        texto_original = palavra.upper()
+        palavra = ''.join(['*' if c != '-' else '-' for c in texto_original])
+
+    texto_oculto = palavra
+
 
 palavra_secreta()
+
+pontos_value = StringVar()
+pontos_value.set(str(PONTOS))
 nick_value = StringVar()
 
 def tela_forca(nick):
-    global im_forca, ft_forca, lb_forca, nick_value, lf_rank, en_entrada_letra, lb_segredo, pontos_value, texto_oculto
-
+    global im_forca, ft_forca, lb_forca, nick_value, lf_rank, en_entrada_letra, lb_segredo, pontos_value, texto_oculto, lb_letras_erradas
     nick_value.set(nick)
 
     pontos_value = StringVar()
@@ -175,33 +405,34 @@ def tela_forca(nick):
 
     lf_tela_toda = LabelFrame(menu_game)
     lf_tela_toda.place(relx=0.5, rely=0.5, anchor=CENTER)
-    lf_pontuação = LabelFrame(lf_tela_toda, text='Pontuação', labelanchor='n', font=("Arial", 9, "bold"))
-    lf_pontuação.grid(row=0, column=0, columnspan=3, sticky='nswe')
+    lf_pontuacao = LabelFrame(lf_tela_toda, text='Pontuação', labelanchor='n', font=("Arial", 9, "bold"))
+    lf_pontuacao.grid(row=0, column=0, columnspan=3, sticky='nswe')
     lf_im_forca = LabelFrame(lf_tela_toda, text='Pegue o Fredd!', labelanchor='n', font=("Arial", 9, "bold"))
     lf_im_forca.grid(row=1, column=0, sticky='nswe')
     lf_letra_errada = LabelFrame(lf_tela_toda, text='7 Tentativas', labelanchor='n', font=("Arial", 9, "bold"))
     lf_letra_errada.grid(row=1, column=1, sticky='nswe')
     lf_rank = LabelFrame(lf_tela_toda, text='Top Rank', labelanchor='n', font=("Arial", 9, "bold"))
     lf_rank.grid(row=1, column=2, rowspan=3, sticky='nswe', padx=10, pady=10)
+    exibir_rank()
     lf_palavra_secreta = LabelFrame(lf_tela_toda, text='Adivinhe qual é a Palavra Secreta!', font=("Arial", 9, "bold"))
     lf_palavra_secreta.grid(row=2, column=0, columnspan=2, sticky='nswe')
     lf_entrada_letra = LabelFrame(lf_tela_toda, text='Entre com UMA LETRA ou com a PALAVRA SECRETA', labelanchor='n', font=("Arial", 9, "bold"))
     lf_entrada_letra.grid(row=3, column=0, columnspan=2, sticky='nswe')
 
-    lf_pontuação.grid_columnconfigure(0, weight=1)
-    lf_pontuação.grid_columnconfigure(1, weight=1)
-    lf_pontuação.grid_columnconfigure(2, weight=1)
-    lf_pontuação.grid_columnconfigure(3, weight=1)
+    lf_pontuacao.grid_columnconfigure(0, weight=1)
+    lf_pontuacao.grid_columnconfigure(1, weight=1)
+    lf_pontuacao.grid_columnconfigure(2, weight=1)
+    lf_pontuacao.grid_columnconfigure(3, weight=1)
 
-    lb_nick = Label(lf_pontuação, text='Nick:', anchor='center')
+    lb_nick = Label(lf_pontuacao, text='Nick:', anchor='center')
     lb_nick.grid(row=0, column=0, sticky='we')
-    nick = Label(lf_pontuação, textvariable=nick_value, anchor='center')
+    nick = Label(lf_pontuacao, textvariable=nick_value, anchor='center')
     nick.grid(row=0, column=1, sticky='we')
-    lb_pontos = Label(lf_pontuação, text='Pontuação:', anchor='center')
-    lb_pontos.grid(row=0, column=2, sticky='we')
+    lb_pontuacao = Label(lf_pontuacao, text="Pontuação:", anchor='center')
+    lb_pontuacao.grid(row=0, column=2, sticky='we')
+    lb_pontos = Label(lf_pontuacao, textvariable=pontos_value, anchor='center')
+    lb_pontos.grid(row=0, column=3, sticky='we')
 
-    pontos = Label(lf_pontuação, textvariable=pontos_value, anchor='center')
-    pontos.grid(row=0, column=3, sticky='we')
 
     im_forca = Image.open("Senac-Minas/Projeto Final/Imagens/Tela_Game.png")
     im_forca = im_forca.resize((250, 250))
@@ -211,7 +442,7 @@ def tela_forca(nick):
 
     lb_letra_errada = Label(lf_letra_errada, text='Letras Erradas:')
     lb_letra_errada.grid(row=0, column=0, padx=10, pady=10, sticky='we')
-    lb_letras_erradas = Label(lf_letra_errada, text='A\nb\nc\nd\ne\nf\ng\n', font=("Arial", 17, "bold"), fg="red")
+    lb_letras_erradas = Label(lf_letra_errada, text='', font=("Arial", 17, "bold"), fg="red")
     lb_letras_erradas.grid(row=1, column=0, padx=10, pady=10, sticky='nswe')
 
     lb_palavra_secreta = Label(lf_palavra_secreta, text='Palavra Secreta:')
@@ -220,7 +451,6 @@ def tela_forca(nick):
     lb_segredo.place(relx=0.25, rely=0.3)
     lb_segredo.config(font=("Arial", 18, "bold"))
 
-    palavra_secreta()
 
     lb_entrada_letra = Label(lf_entrada_letra, text='Entre com uma letra:', anchor='e')
     lb_entrada_letra.grid(row=0, column=0, padx=10, pady=10, sticky='we')
@@ -237,15 +467,18 @@ def tela_forca(nick):
         lb_rank = Label(lf_rank, text=f'{i}º - ', anchor='e')
         lb_rank.grid(row=i, column=0, padx=1, pady=1, sticky='we')
 
+def enfrentar(nick_value):
+    palavra_secreta()
+    tela_forca(nick_value)
+
 def tela_win():
     global nick_value, pontos_value, im_win_game, ft_win_game, lb_win_game
 
     limpar_janela()
-
     lf_win_game = LabelFrame(menu_game, text="O fredd foi pego! SERÁ?", labelanchor='n')
     lf_win_game.place(relx=0.5, rely=0.5, anchor=CENTER)
     
-    lb_vitoria = Label(lf_win_game, text="Parabéns, você venceu!", font=("Arial", 16, "bold"))
+    lb_vitoria = Label(lf_win_game, text="Parabéns, você acertou a palavra: {}".format(texto_original), font=("Arial", 16, "bold"))
     lb_vitoria.grid(row=0 , column=0, columnspan=2, padx=10, pady=10)
 
     im_win_game = Image.open("Senac-Minas\Projeto Final\Imagens\Win_Game.jpg")
@@ -253,7 +486,7 @@ def tela_win():
     lb_win_game = Label(lf_win_game, image=ft_win_game)
     lb_win_game.grid(row=1, column=0,columnspan=2, padx=10, pady=10)
     
-    bt_continuar = Button(lf_win_game, text='Enfrentar SEUS MEDOS')
+    bt_continuar = Button(lf_win_game, text='Enfrentar SEUS MEDOS', command=lambda: enfrentar(nick_value.get()))
     bt_continuar.grid(row=2, column='0', padx=10, pady=10)
     bt_game_over = Button(lf_win_game, text='Sucumbir AO MEDO!', command=end_game)
     bt_game_over.grid(row=2, column='1', padx=10, pady=10)
@@ -288,7 +521,17 @@ def end_game():
     restart_game = Button(end_game, text='Restart', anchor=CENTER, command=menu)
     restart_game.place(relx=0.45, rely=0.7)
 
-
+    conexao = sqlite3.connect("Senac-Minas/Projeto Final/Banco/Banco_de_Dados.db")
+    cursor = conexao.cursor()
+    cursor.execute("""
+                   insert into Pontuação
+                   (nome, pontos) values (?, ?)""",
+                   (nick_value.get(), pontos_value.get())
+                   )
+    
+    conexao.commit()
+    conexao.close()
+    palavra_secreta()
 
 def test_do_testando():
     teste = Tk()
