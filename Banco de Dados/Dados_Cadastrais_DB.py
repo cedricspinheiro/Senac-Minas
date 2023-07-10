@@ -3,7 +3,7 @@ from tkinter import *
 
 
 def criar_banco():
-    conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
+    conexao = sqlite3.connect('Bancos_Dados/Dados_Cadastrais_DB.db')
     cursor = conexao.cursor()
 
     cursor.execute('''
@@ -17,12 +17,14 @@ def criar_banco():
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS dados_enderecos (
-            cpf_dados_pessoais TEXT PRIMARY KEY,
+            id integer PRIMARY KEY,
             rua TEXT,
             numero TEXT,
             bairro TEXT,
             cidade TEXT,
-            uf TEXT
+            uf TEXT,
+            dados_pessoas_cpf text,
+            foreign key (dados_pessoas_cpf) references dados_pessoais(cpf)
         )
     ''')
 
@@ -31,7 +33,7 @@ def criar_banco():
 
 
 def save():
-    conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
+    conexao = sqlite3.connect('Bancos_Dados/Dados_Cadastrais_DB.db')
     cursor = conexao.cursor()
     cursor.execute('''
         INSERT INTO dados_pessoais (nome, cpf, telefone, data)
@@ -39,9 +41,9 @@ def save():
     ''', (enome.get(), ecpf.get(), etelefone.get(), edata.get()))
 
     cursor.execute('''
-        INSERT INTO dados_enderecos (cpf_dados_pessoais,rua, numero, bairro, cidade, uf)
+        INSERT INTO dados_enderecos (rua, numero, bairro, cidade, uf, dados_pessoas_cpf)
         VALUES (?, ?, ?, ?, ?, ?);
-    ''', (ecpf.get(), erua.get(), enumero.get(), ebairro.get(), ecidade.get(), euf.get()))
+    ''', (erua.get(), enumero.get(), ebairro.get(), ecidade.get(), euf.get(), ecpf.get()))
 
     conexao.commit()
     conexao.close()
@@ -59,9 +61,9 @@ def save():
 def lista_cadastros():
     def atualizar_cpf():
         def gravar_alteracao():
-            conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
-            cursor = conexao.cursor()
-            cursor.execute(f'''
+            conexao = sqlite3.connect('Bancos_Dados/Dados_Cadastrais_DB.db')
+            cursor1 = conexao.cursor()
+            cursor1.execute(f'''
                 update dados_pessoais set
                 nome = '{enome_up.get()}',
                 cpf = '{et_cpf.get()}',
@@ -69,18 +71,15 @@ def lista_cadastros():
                 data = '{edata_up.get()}'
                 where cpf = '{et_cpf.get()}';
             ''')
-
-            cursor1 = conexao.cursor()
-            cursor1.execute(f'''
-                            update dados_enderecos set
-                            cpf_dados_pessoais = '{et_cpf.get()}',
-                            rua = '{erua_up.get()}',
-                            numero = '{enumero_up.get()}',
-                            bairro = '{ebairro_up.get()}',
-                            cidade = '{ecidade_up.get()}',
-                            uf = '{euf_up.get()}'
-                            where cpf_dados_pessoais = '{et_cpf.get()}';
-                            ''')
+            cursor2 = conexao.cursor()
+            cursor2.execute(f'''
+                update dados_enderecos set
+                rua = '{erua_up.get()}',
+                numero = '{enumero_up.get()}',
+                bairro = '{ebairro_up.get()}',
+                cidade = '{ecidade_up.get()}',
+                uf = '{euf_up}'
+            ''')
             conexao.commit()
             conexao.close()
 
@@ -144,11 +143,11 @@ def lista_cadastros():
         global lb_pessoas
         global lb_enderecos
 
-        conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
-        cursor = conexao.cursor()
-        cursor.execute(f'DELETE FROM dados_pessoais WHERE cpf = "{et_cpf.get()}"')
+        conexao = sqlite3.connect('Bancos_Dados/Dados_Cadastrais_DB.db')
+        cursor1 = conexao.cursor()
+        cursor1.execute(f'DELETE FROM dados_pessoais WHERE cpf = "{et_cpf.get()}"')
         cursor2 = conexao.cursor()
-        cursor2.execute(f'DELETE FROM dados_enderecos WHERE cpf_dados_pessoais = "{et_cpf.get()}"')
+        cursor2.execute(f'delete from dados_enderecos where dados_pessoas_cpf = "{et_cpf.get()}"')
         conexao.commit()
         conexao.close()
 
@@ -164,7 +163,8 @@ def lista_cadastros():
         global lb_pessoas
         global lb_enderecos
 
-        conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
+
+        conexao = sqlite3.connect('Bancos_Dados/Dados_Cadastrais_DB.db')
         cursor1 = conexao.cursor()
         cursor1.execute(f'select * from dados_pessoais WHERE cpf = "{et_cpf.get()}"')
         dados_pessoas = cursor1.fetchall()
@@ -174,18 +174,16 @@ def lista_cadastros():
             lb_pessoas['text'] += '\n' + str(dados_pessoa)
 
         cursor2 = conexao.cursor()
-        cursor2.execute(
-            f'select rua, numero, bairro, cidade, uf from dados_enderecos WHERE cpf_dados_pessoais = "{et_cpf.get()}"')
+        cursor2.execute(f'select rua, numero, bairro, cidade, uf from dados_enderecos where dados_pessoas_cpf = "{et_cpf.get()}"')
         dados_enderecos = cursor2.fetchall()
         lb_enderecos = Label(lf_resultado, text='Leitura de Endereços', justify='center')
         lb_enderecos.grid(row=1, column=1)
         for dados_endereco in dados_enderecos:
             lb_enderecos['text'] += '\n' + str(dados_endereco)
-        conexao.close()
-        lb_deletado.config(text=(''))
+
 
     def bc_pessoas():
-        conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
+        conexao = sqlite3.connect('Bancos_Dados/Dados_Cadastrais_DB.db')
         cursor = conexao.cursor()
         cursor.execute('select * from dados_pessoais')
         dados_pessoas = cursor.fetchall()
@@ -198,7 +196,7 @@ def lista_cadastros():
         conexao.close()
 
     def bc_endereco():
-        conexao = sqlite3.connect('Dados_Cadastrais_DB.db')
+        conexao = sqlite3.connect('Bancos_Dados/Dados_Cadastrais_DB.db')
         cursor = conexao.cursor()
         cursor.execute('select rua, numero, bairro, cidade, uf from dados_enderecos')
         dados_enderecos = cursor.fetchall()
@@ -247,7 +245,7 @@ def lista_cadastros():
 janela = Tk()
 janela.title('Cadastro')
 janela.config(borderwidth=10)
-# janela.option_add('*Font', 'Arial 8 bold')
+janela.option_add('*Font', 'Arial 8 bold')
 
 dados = LabelFrame(janela, text='Dados Pessoais', font='Arial 14 italic')
 dados.grid(row=0, column=0, sticky='we', columnspan=5)
