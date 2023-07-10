@@ -470,6 +470,7 @@ def tela_forca(nick):
 def enfrentar(nick_value):
     palavra_secreta()
     tela_forca(nick_value)
+    ERROS = 0
 
 def tela_win():
     global nick_value, pontos_value, im_win_game, ft_win_game, lb_win_game
