@@ -27,7 +27,7 @@ menu_game.resizable(False, False)
 ### NÃO MEXER AQUI ###
 
 def BANCO():
-    conexao = sqlite3.connect('Senac-Minas\\Projeto Final\\Banco\\Banco_de_Dados.db')
+    conexao = sqlite3.connect('Banco\\Banco_de_Dados.db')
     cursor = conexao.cursor()
     cursor.execute("""
             create table if not exists Pontuação (
@@ -56,7 +56,7 @@ def salvar_conteudo():
     if txt_cadastro_autor == "":
         txt_cadastro_autor = "Autor Anônimo"
     
-    conexao = sqlite3.connect('Senac-Minas/Projeto Final/Banco/Banco_de_Dados.db')
+    conexao = sqlite3.connect('Banco/Banco_de_Dados.db')
     cursor = conexao.cursor()
     cursor.execute("""
                    INSERT INTO Palavras (Palavra, Dica, Autor)
@@ -80,7 +80,7 @@ def limpar_janela():
 
 def atualizar_conteudo(en_pesquisa):
     palavra_pesquisada = en_pesquisa.get().upper()
-    conexao = sqlite3.connect("Senac-Minas\Projeto Final\Banco\Banco_de_Dados.db")
+    conexao = sqlite3.connect("Banco\Banco_de_Dados.db")
     cursor = conexao.cursor()
     cursor.execute(f"SELECT Palavra, Dica, Autor FROM Palavras WHERE Palavra = '{palavra_pesquisada}'")
     resultado = cursor.fetchone()
@@ -104,7 +104,7 @@ def atualizar_conteudo(en_pesquisa):
 
             atualizacao.destroy()
 
-            conexao = sqlite3.connect("Senac-Minas\Projeto Final\Banco\Banco_de_Dados.db")
+            conexao = sqlite3.connect("Banco\Banco_de_Dados.db")
             cursor = conexao.cursor()
             cursor.execute(f"""
                 UPDATE Palavras
@@ -121,7 +121,7 @@ def atualizar_conteudo(en_pesquisa):
             exibir_conteudo()
         
         def deletar_edicao():
-            conexao = sqlite3.connect("Senac-Minas\Projeto Final\Banco\Banco_de_Dados.db")
+            conexao = sqlite3.connect("Banco\Banco_de_Dados.db")
             cursor = conexao.cursor()
             cursor.execute(f"""
                            DELETE FROM Palavras
@@ -206,7 +206,7 @@ def cadastro_palavras():
     bt_pesquisa = tk.Button(lf_pesquisa, text='Pesquisar', command=lambda: atualizar_conteudo(en_pesquisa))
     bt_pesquisa.grid(row=0, column=2, sticky='we')   
     
-    im_cadastro = Image.open("Senac-Minas\Projeto Final\Imagens\End.jpg").resize((241, 360))
+    im_cadastro = Image.open("Imagens\End.jpg").resize((241, 360))
     ft_cadastro = ImageTk.PhotoImage(im_cadastro)
     lb_im_foto = Label(lf_im_BANCO, image=ft_cadastro)
     lb_im_foto.grid(row=0, column=0, sticky='nswe', padx=10, pady=10)
@@ -214,7 +214,7 @@ def cadastro_palavras():
 
 def exibir_conteudo():
     global lb_dicas_salvas, lb_Palavras_salvas, lb_autor_salvas, lf_BANCO
-    conexao = sqlite3.connect("Senac-Minas\Projeto Final/Banco/Banco_de_Dados.db")
+    conexao = sqlite3.connect("Banco/Banco_de_Dados.db")
 
     cursor1 = conexao.cursor()
     cursor1.execute("SELECT palavra FROM Palavras ORDER BY rowid")
@@ -248,7 +248,7 @@ def exibir_conteudo():
 def exibir_rank():
     global lb_nome, lb_pontos
 
-    conexao = sqlite3.connect('Senac-Minas\Projeto Final\Banco\Banco_de_Dados.db')
+    conexao = sqlite3.connect('Banco\Banco_de_Dados.db')
     cursor = conexao.cursor()
     cursor.execute("""
             select * from Pontuação
@@ -276,7 +276,7 @@ def exibir_rank():
 
 
 def zerar_rank():
-    conexao = sqlite3.connect('Senac-Minas\Projeto Final\Banco\Banco_de_Dados.db')
+    conexao = sqlite3.connect('Banco\Banco_de_Dados.db')
     cursor = conexao.cursor()
     cursor.execute('drop table Pontuação')
     conexao.commit()
@@ -288,7 +288,7 @@ def zerar_rank():
 def menu():
     limpar_janela()
     global ft_menu_game
-    im_menu_game = Image.open("Senac-Minas\Projeto Final\Imagens\Menu Game.jpg")
+    im_menu_game = Image.open("Imagens\Menu Game.jpg")
     ft_menu_game = ImageTk.PhotoImage(im_menu_game)
 
     lf_menu_game = LabelFrame(menu_game, text='Você está REALMENTE pronto?', labelanchor='n', font=("Arial", 9, "bold"))
@@ -369,7 +369,7 @@ def verificar():
 def palavra_secreta():
     global texto_oculto, texto_original
 
-    conexao = sqlite3.connect('Senac-Minas/Projeto Final/Banco/Banco_de_Dados.db')
+    conexao = sqlite3.connect('Banco/Banco_de_Dados.db')
     cursor = conexao.cursor()
     cursor.execute("SELECT Palavra FROM Palavras")
     palavras = cursor.fetchall()
@@ -434,7 +434,7 @@ def tela_forca(nick):
     lb_pontos.grid(row=0, column=3, sticky='we')
 
 
-    im_forca = Image.open("Senac-Minas/Projeto Final/Imagens/Tela_Game.png")
+    im_forca = Image.open("Imagens/Tela_Game.png")
     im_forca = im_forca.resize((250, 250))
     ft_forca = ImageTk.PhotoImage(im_forca)
     lb_forca = Label(lf_im_forca, image=ft_forca)
@@ -482,7 +482,7 @@ def tela_win():
     lb_vitoria = Label(lf_win_game, text="Parabéns, você acertou a palavra: {}".format(texto_original), font=("Arial", 16, "bold"))
     lb_vitoria.grid(row=0 , column=0, columnspan=2, padx=10, pady=10)
 
-    im_win_game = Image.open("Senac-Minas\Projeto Final\Imagens\Win_Game.jpg")
+    im_win_game = Image.open("Imagens\Win_Game.jpg")
     ft_win_game = ImageTk.PhotoImage(im_win_game)
     lb_win_game = Label(lf_win_game, image=ft_win_game)
     lb_win_game.grid(row=1, column=0,columnspan=2, padx=10, pady=10)
@@ -507,7 +507,7 @@ def end_game():
     end_game = LabelFrame(menu_game)
     end_game.place(rely=0.5, relx=0.5, anchor=CENTER)
 
-    im_end_game = Image.open("Senac-Minas\Projeto Final\Imagens\Game_Over.png")
+    im_end_game = Image.open("Imagens\Game_Over.png")
     ft_end_game = ImageTk.PhotoImage(im_end_game)
     lb_end_game = Label(end_game, image=ft_end_game)
     lb_end_game.grid(row=0, column=0, padx=10, pady=10)
