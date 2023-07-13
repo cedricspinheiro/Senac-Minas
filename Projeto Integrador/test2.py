@@ -13,10 +13,7 @@ def on_leave(event):
     global moved
     moved = False
 
-root = tk.Tk()
-root.geometry("700x640")  # Define as dimensões da janela
-root.resizable(False, False)
-button = tk.Button(root, text="Me mova!", width=10, height=2)
+button = tk.Button(lf_troll, text="Me mova!", width=10, height=2)
 button.place(x=100, y=100)  # Define as coordenadas iniciais do botão
 
 moved = False

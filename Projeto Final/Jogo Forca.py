@@ -20,7 +20,7 @@ lb_segredo = None  # Variável global para armazenar o widget Label lb_segredo
 ### TELA E TAMANHO DEFINIDA ###
 menu_game = Tk()
 menu_game.title("Jogo da Forca")
-menu_game.geometry("750x690")
+menu_game.geometry("750x750")
 menu_game.resizable(False, False)
 
 
@@ -309,6 +309,33 @@ def menu():
     bt_teste = Button(menu_game, text="Testar LFrames", anchor='center', command=test_do_testando)
     bt_teste.grid(row=1, column=0, padx=10, pady=10)
 
+    lf_top3 = LabelFrame(menu_game, text="Top 3 Rank", labelanchor='n', font=("Arial", 9, "bold"))
+    lf_top3.place(relx=0.35, rely=0.7)
+
+    conexao = sqlite3.connect('Banco\Banco_de_Dados.db')
+    cursor = conexao.cursor()
+    cursor.execute("""
+            select * from Pontuação
+            order by pontos desc
+            """)
+    resultado = cursor.fetchall()
+    conexao.close()
+
+    resultado_classificado = sorted(resultado, key=lambda x: x[2], reverse=True)
+
+    column = 1
+
+    for posicao in resultado_classificado[:3]:
+        nome = posicao[1]
+        pontos = posicao[2]
+
+        lb_nome = Label(lf_top3, text=nome, anchor='center')
+        lb_nome.grid(row=1, column=column, padx=10, pady=2.5)
+
+        lb_pontos = Label(lf_top3, text=pontos, anchor='center')
+        lb_pontos.grid(row=2, column=column, padx=10, pady=2.5)
+
+        column += 1
 def tela_nick():
     global en_nick
     limpar_janela()
@@ -323,6 +350,7 @@ def tela_nick():
     lb_nick.grid(row=1, column=0, sticky='we')
     en_nick = Entry(lf_tela_nick)
     en_nick.grid(row=1, column=1)
+    en_nick.bind("<Return>", lambda event: tela_forca(en_nick.get()))
     bt_nick = Button(lf_tela_nick, text="AVANÇAR", anchor="center", command=lambda: tela_forca(en_nick.get()))
     bt_nick.grid(row=1, column=2)
     bt_nick.configure(background="black", foreground="white", activebackground="white", activeforeground="black")
@@ -367,13 +395,12 @@ def verificar():
 
 
 def palavra_secreta():
-    global texto_oculto, texto_original
+    global texto_oculto, texto_original, dica_palavra
 
     conexao = sqlite3.connect('Banco/Banco_de_Dados.db')
     cursor = conexao.cursor()
     cursor.execute("SELECT Palavra FROM Palavras")
     palavras = cursor.fetchall()
-    conexao.close()
 
     # Selecionar uma palavra aleatória
     palavra = random.choice(palavras)[0]
@@ -385,6 +412,13 @@ def palavra_secreta():
         texto_original = palavra.upper()
         palavra = ''.join(['*' if c != '-' else '-' for c in texto_original])
 
+    cursor.execute("SELECT Dica FROM Palavras")
+    dica_palavra = cursor.fetchone()
+
+    conexao.close()
+
+
+
     texto_oculto = palavra
 
 
@@ -395,7 +429,7 @@ pontos_value.set(str(PONTOS))
 nick_value = StringVar()
 
 def tela_forca(nick):
-    global im_forca, ft_forca, lb_forca, nick_value, lf_rank, en_entrada_letra, lb_segredo, pontos_value, texto_oculto, lb_letras_erradas
+    global im_forca, lf_tela_toda, ft_forca, lb_forca, nick_value, lf_rank, en_entrada_letra, lb_segredo, pontos_value, texto_oculto, lb_letras_erradas
     nick_value.set(nick)
 
     pontos_value = StringVar()
@@ -445,17 +479,22 @@ def tela_forca(nick):
     lb_letras_erradas = Label(lf_letra_errada, text='', font=("Arial", 17, "bold"), fg="red")
     lb_letras_erradas.grid(row=1, column=0, padx=10, pady=10, sticky='nswe')
 
-    lb_palavra_secreta = Label(lf_palavra_secreta, text='Palavra Secreta:')
-    lb_palavra_secreta.grid(row=0, column=0, columnspan=3, padx=10, pady=10)
+    lb_palavra_secreta = Label(lf_palavra_secreta, text='Palavra Secreta:', anchor=CENTER)
+    lb_palavra_secreta.grid(row=1, column=0, columnspan=3, padx=10, pady=10)
+    lb_dica = Label(lf_palavra_secreta, text="Dica:", anchor=CENTER)
+    lb_dica.grid(row=0, column=2, padx=10, pady=10)
+    lb_dica_palavra = Label(lf_palavra_secreta, text=dica_palavra, anchor=CENTER)
+    lb_dica_palavra.grid(row=0, column=3, padx=10, pady=10)
+    lb_dica_palavra.config(font=("Arial", 12, "bold"))
     lb_segredo = Label(lf_palavra_secreta, text=texto_oculto, anchor=CENTER)
-    lb_segredo.place(relx=0.25, rely=0.3)
+    lb_segredo.place(relx=0.5, rely=0.5)
     lb_segredo.config(font=("Arial", 18, "bold"))
 
-
     lb_entrada_letra = Label(lf_entrada_letra, text='Entre com uma letra:', anchor='e')
-    lb_entrada_letra.grid(row=0, column=0, padx=10, pady=10, sticky='we')
+    lb_entrada_letra.grid(row=0, rowspan=3, column=0, padx=10, pady=10, sticky='we')
     en_entrada_letra = Entry(lf_entrada_letra)
     en_entrada_letra.grid(row=0, column=1, padx=10, pady=10)
+    en_entrada_letra.bind("<Return>", lambda event: verificar())  # Adiciona a associação do evento
     bt_entrada_letra = Button(lf_entrada_letra, text="Verificar", command=verificar)
     bt_entrada_letra.grid(row=0, column=2, padx=10, pady=10)
     bt_entrada_letra.configure(background="black", foreground="white", activebackground="white", activeforeground="black")
@@ -467,7 +506,12 @@ def tela_forca(nick):
         lb_rank = Label(lf_rank, text=f'{i}º - ', anchor='e')
         lb_rank.grid(row=i, column=0, padx=1, pady=1, sticky='we')
 
+    bt_Trolagem = Button(lf_tela_toda, text="Desistir", command=Trolagem)
+    bt_Trolagem.grid(row=4, column=2, padx=10, pady=10)
+
+
 def enfrentar(nick_value):
+    global ERROS
     palavra_secreta()
     tela_forca(nick_value)
     ERROS = 0
@@ -525,7 +569,7 @@ def end_game():
     conexao = sqlite3.connect("Senac-Minas/Projeto Final/Banco/Banco_de_Dados.db")
     cursor = conexao.cursor()
     cursor.execute("""
-                   insert into Pontuação
+                   INSERT INTO Pontuação
                    (nome, pontos) values (?, ?)""",
                    (nick_value.get(), pontos_value.get())
                    )
@@ -554,6 +598,54 @@ def test_do_testando():
     btfechar_janela .grid(row=2, column=1, sticky='we')
     bttest_do_testando = Button(teste, text='test_do_testando', command=teste.destroy)
     bttest_do_testando .grid(row=2, column=2, sticky='we')
+
+
+
+def Trolagem():
+    global im_troll, ft_troll, lb_troll, im_troll1, ft_troll1, lb_troll1
+
+
+    lf_tela_toda.forget()
+    lf_troll = LabelFrame(menu_game, text='"Nunca pare de sonhar" - Freddy Krueger', labelanchor='n')
+    lf_troll.grid(row=0, column=0, padx=10, pady=10)
+
+    im_troll = Image.open("Imagens/End_Game.jpg")
+    im_troll = im_troll.resize((580, 395))
+    ft_troll = ImageTk.PhotoImage(im_troll)
+    lb_troll = Label(lf_troll, image=ft_troll)
+    lb_troll.grid(row=0, column=0, padx=10, pady=10)
+
+    im_troll1 = Image.open("Imagens/remake.jpg")
+    im_troll1 = im_troll1.resize((580, 265))
+    ft_troll1 = ImageTk.PhotoImage(im_troll1)
+    lb_troll1 = Label(lf_troll, image=ft_troll1)
+    lb_troll1.grid(row=1, column=0, padx=10, pady=10)
+
+    def on_enter(event):
+        global moved
+
+        moved = False
+
+        if not moved:
+            x = random.randint(0,
+                               lf_troll.winfo_width() - button.winfo_width())  # Gera uma coordenada X aleatória dentro da largura da janela
+            y = random.randint(0,
+                               lf_troll.winfo_height() - button.winfo_height())  # Gera uma coordenada Y aleatória dentro da altura da janela
+            button.place(x=x, y=y)  # Define as novas coordenadas quando o mouse entra
+            moved = True
+
+    def on_leave(event):
+        global moved
+        moved = False
+
+    button = tk.Button(lf_troll, text="DESISTIR!", )
+    button.place(x=200, y=400)  # Define as coordenadas iniciais do botão
+    bt_nao = Button(lf_troll, text="NÃO DESISTIR!", command=lf_troll.destroy)
+    bt_nao.place(x=300, y=400)
+
+
+    button.bind("<Enter>", on_enter)  # Associa a função on_enter ao evento de mouse 'Enter'
+    button.bind("<Leave>", on_leave)  # Associa a função on_leave ao evento de mouse 'Leave'
 
 
 BANCO()
