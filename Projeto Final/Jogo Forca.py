@@ -287,7 +287,8 @@ def zerar_rank():
 
 def menu():
     limpar_janela()
-    global ft_menu_game
+    global ft_menu_game, ERROS
+    ERROS = 0
     im_menu_game = Image.open("Imagens\Menu Game.jpg")
     ft_menu_game = ImageTk.PhotoImage(im_menu_game)
 
@@ -542,7 +543,6 @@ def tela_win():
     lb_pontos = Label(lf_win_game, text="Pontuação: " + pontos_value.get(), font=("Arial", 12))
     lb_pontos.place(relx=0.6, rely=0.1)
 
-    
 
 
 def end_game():
@@ -566,7 +566,7 @@ def end_game():
     restart_game = Button(end_game, text='Restart', anchor=CENTER, command=menu)
     restart_game.place(relx=0.45, rely=0.7)
 
-    conexao = sqlite3.connect("Senac-Minas/Projeto Final/Banco/Banco_de_Dados.db")
+    conexao = sqlite3.connect("Banco/Banco_de_Dados.db")
     cursor = conexao.cursor()
     cursor.execute("""
                    INSERT INTO Pontuação
